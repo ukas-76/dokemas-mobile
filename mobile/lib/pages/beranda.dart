@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Semua Kategori',
+                'Seluruh Kategori',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryDark,
@@ -441,7 +441,9 @@ class _HomePageState extends State<HomePage> {
                   '${destination.openHour} -\n${destination.closeHour}',
               description:
                   'Nikmati keindahan pesona destinasi wisata terbaik di Banyumas.',
-              galleryImages: destination.images.map((img) => img.imageUrl).toList(),
+              galleryImages: destination.images
+                  .map((img) => img.imageUrl)
+                  .toList(),
             ),
           ),
         );
@@ -611,7 +613,9 @@ class _HomePageState extends State<HomePage> {
                         '${destination.openHour} -\n${destination.closeHour}',
                     description:
                         'Nikmati keseruan berwisata di tempat terpopuler daerah Banyumas.',
-                    galleryImages: destination.images.map((img) => img.imageUrl).toList(),
+                    galleryImages: destination.images
+                        .map((img) => img.imageUrl)
+                        .toList(),
                   ),
                 ),
               );

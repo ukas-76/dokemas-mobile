@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Laporan Kelompok – DOKEMAS</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman:ital,wght@0,400;0,700;1,400&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      color: #000;
+      background: #d0d0d0;
+    }
+
+    /* ── Halaman (A4) ── */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      padding: 25mm 30mm 25mm 35mm;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      page-break-after: always;
+    }
+
+    /* ── Cover ── */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 247mm;
+    }
+
+    .cover .logo-box {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #1a6b3c, #2ecc71);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+
+    .cover .logo-box span {
+      font-size: 22pt;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .cover .title-app {
+      font-size: 24pt;
+      font-weight: 700;
+      letter-spacing: 3px;
+      margin-bottom: 4px;
+    }
+
+    .cover .subtitle-app {
+      font-size: 11pt;
+      color: #444;
+      margin-bottom: 30px;
+      font-style: italic;
+    }
+
+    .cover hr.line {
+      width: 80%;
+      border: none;
+      border-top: 2px solid #000;
+      margin: 16px auto;
+    }
+
+    .cover .doc-title {
+      font-size: 16pt;
+      font-weight: 700;
+      margin: 12px 0 6px 0;
+    }
+
+    .cover .doc-subtitle {
+      font-size: 12pt;
+      margin-bottom: 30px;
+    }
+
+    .cover .kelompok-box {
+      border: 2px solid #000;
+      border-radius: 8px;
+      padding: 16px 32px;
+      margin: 16px 0;
+      width: 70%;
+      text-align: left;
+    }
+
+    .cover .kelompok-box p {
+      font-size: 11pt;
+      line-height: 1.9;
+    }
+
+    .cover .matkul {
+      font-size: 12pt;
+      font-weight: 700;
+      margin-top: 18px;
+    }
+
+    .cover .instansi {
+      font-size: 11pt;
+      margin-top: 4px;
+    }
+
+    .cover .tahun {
+      font-size: 11pt;
+      margin-top: 6px;
+      font-weight: 700;
+    }
+
+    /* ── Konten ── */
+    h1.bab {
+      font-size: 14pt;
+      font-weight: 700;
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      text-decoration: underline;
+    }
+
+    h2.subbab {
+      font-size: 12pt;
+      font-weight: 700;
+      margin: 18px 0 8px 0;
+    }
+
+    h3.subsubbab {
+      font-size: 12pt;
+      font-weight: 700;
+      margin: 14px 0 6px 0;
+    }
+
+    p {
+      text-align: justify;
+      line-height: 1.8;
+      margin-bottom: 8px;
+    }
+
+    p.indent {
+      text-indent: 1.25cm;
+    }
+
+    /* ── Tabel ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 11pt;
+    }
+
+    th {
+      background: #1a6b3c;
+      color: #fff;
+      padding: 8px 10px;
+      border: 1px solid #000;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    td {
+      border: 1px solid #000;
+      padding: 7px 10px;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+
+    td.no {
+      text-align: center;
+      width: 5%;
+    }
+
+    tr:nth-child(even) td {
+      background: #f5faf7;
+    }
+
+    /* ── Step box ── */
+    .step-box {
+      border: 1px solid #ccc;
+      border-left: 4px solid #1a6b3c;
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      background: #fafafa;
+    }
+
+    .step-box .step-title {
+      font-weight: 700;
+      font-size: 11pt;
+      margin-bottom: 4px;
+    }
+
+    .step-box ul {
+      margin-left: 18px;
+      line-height: 1.7;
+      font-size: 11pt;
+    }
+
+    .note-box {
+      border: 1px solid #aaa;
+      background: #fffbe6;
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-size: 10.5pt;
+      margin: 10px 0;
+      font-style: italic;
+    }
+
+    /* Print */
+    @media print {
+      body { background: #fff; }
+      .page { box-shadow: none; margin: 0; page-break-after: always; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HALAMAN 1 – COVER
+═══════════════════════════════════════════ -->
+<div class="page">
+  <div class="cover">
+    <div class="logo-box"><span>DOK</span></div>
+    <div class="title-app">DOKEMAS</div>
+    <div class="subtitle-app">Dolan Keliling Banyumas</div>
+
+    <hr class="line"/>
+    <div class="doc-title">LAPORAN KELOMPOK</div>
+    <div class="doc-subtitle">Daftar Kontribusi Anggota &amp; Manual Book Aplikasi</div>
+    <hr class="line"/>
+
+    <div class="kelompok-box">
+      <p><strong>Kelompok &nbsp;:</strong> [Nama / Nomor Kelompok]</p>
+      <p><strong>Anggota &nbsp;&nbsp;:</strong></p>
+      <p>1. [Nama Anggota 1] &nbsp;&nbsp;/ [NIM]</p>
+      <p>2. [Nama Anggota 2] &nbsp;&nbsp;/ [NIM]</p>
+      <p>3. [Nama Anggota 3] &nbsp;&nbsp;/ [NIM]</p>
+      <p>4. [Nama Anggota 4] &nbsp;&nbsp;/ [NIM]</p>
+      <p>5. [Nama Anggota 5] &nbsp;&nbsp;/ [NIM]</p>
+    </div>
+
+    <div class="matkul">Pemrograman Mobile</div>
+    <div class="instansi">[Nama Universitas / Program Studi]</div>
+    <div class="tahun">2026</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     HALAMAN 2 – DAFTAR KONTRIBUSI ANGGOTA
+═══════════════════════════════════════════ -->
+<div class="page">
+  <h1 class="bab">BAB I<br/>Daftar Kontribusi Anggota Kelompok</h1>
+
+  <p class="indent">
+    Berikut adalah daftar kontribusi masing-masing anggota kelompok dalam pengembangan
+    aplikasi mobile <strong>DOKEMAS (Dolan Keliling Banyumas)</strong>. Aplikasi ini dibangun
+    menggunakan framework <strong>Flutter</strong> pada sisi mobile dan <strong>Laravel 13</strong>
+    pada sisi backend dengan database MySQL.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="no">No.</th>
+        <th>Nama &amp; NIM</th>
+        <th>Peran / Kontribusi</th>
+        <th style="width:22%">Modul / File Utama</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="no">1</td>
+        <td>
+          <strong>[Nama Anggota 1]</strong><br/>
+          NIM: [NIM]
+        </td>
+        <td>
+          [Contoh: Backend Laravel – setup API, autentikasi Sanctum, endpoint destinasi &amp; kategori]
+        </td>
+        <td>
+          <code>backend/app/Http/Controllers/</code><br/>
+          <code>routes/api.php</code>
+        </td>
+      </tr>
+      <tr>
+        <td class="no">2</td>
+        <td>
+          <strong>[Nama Anggota 2]</strong><br/>
+          NIM: [NIM]
+        </td>
+        <td>
+          [Contoh: UI Flutter – halaman Beranda, Explore, filter destinasi]
+        </td>
+        <td>
+          <code>pages/beranda.dart</code><br/>
+          <code>pages/explore_page.dart</code>
+        </td>
+      </tr>
+      <tr>
+        <td class="no">3</td>
+        <td>
+          <strong>[Nama Anggota 3]</strong><br/>
+          NIM: [NIM]
+        </td>
+        <td>
+          [Contoh: UI Flutter – Detail Destinasi, Review, Wishlist, integrasi API]
+        </td>
+        <td>
+          <code>detail_destinasi_screen.dart</code><br/>
+          <code>wishlist_page.dart</code>
+        </td>
+      </tr>
+      <tr>
+        <td class="no">4</td>
+        <td>
+          <strong>[Nama Anggota 4]</strong><br/>
+          NIM: [NIM]
+        </td>
+        <td>
+          [Contoh: UI Flutter – fitur Itinerary (buat, lihat, hapus), halaman Profil &amp; Pengaturan]
+        </td>
+        <td>
+          <code>pages/user/itinerary/</code><br/>
+          <code>pages/user/profile/</code>
+        </td>
+      </tr>
+      <tr>
+        <td class="no">5</td>
+        <td>
+          <strong>[Nama Anggota 5]</strong><br/>
+          NIM: [NIM]
+        </td>
+        <td>
+          [Contoh: Panel Admin Flutter – Dashboard, CRUD Destinasi, Kategori, Fasilitas, User &amp; Review]
+        </td>
+        <td>
+          <code>pages/admin/</code><br/>
+          <code>backend/.../Admin/</code>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note-box">
+    &#9888; Ganti semua teks dalam kurung siku <strong>[…]</strong> dengan data yang sebenarnya.
+    Kontribusi di atas merupakan pembagian peran utama; dalam praktiknya setiap anggota juga saling membantu antar bagian.
+  </div>
+
+  <h2 class="subbab">1.1 Teknologi yang Digunakan</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Komponen</th>
+        <th>Teknologi</th>
+        <th>Keterangan</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Mobile App</td><td>Flutter (Dart) v3.10.4</td><td>UI cross-platform Android &amp; iOS</td></tr>
+      <tr><td>Backend API</td><td>Laravel 13, PHP 8.4</td><td>REST API dengan autentikasi Sanctum</td></tr>
+      <tr><td>Database</td><td>MySQL</td><td>10 tabel: users, destinations, categories, dll.</td></tr>
+      <tr><td>State Management</td><td>Provider</td><td>AuthProvider, WishlistProvider, ItineraryProvider, ReviewProvider</td></tr>
+      <tr><td>HTTP Client</td><td>package:http</td><td>Komunikasi dengan REST API Laravel</td></tr>
+      <tr><td>Storage Lokal</td><td>shared_preferences</td><td>Simpan token &amp; status login di perangkat</td></tr>
+      <tr><td>Image Processing</td><td>GD / Imagick / cwebp</td><td>Konversi foto upload ke format WebP otomatis</td></tr>
+      <tr><td>Dokumentasi API</td><td>Scramble (OpenAPI 3.1)</td><td>Auto-generate dari kode Laravel, akses <code>/docs/api</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     HALAMAN 3 – MANUAL BOOK: Pengenalan
+═══════════════════════════════════════════ -->
+<div class="page">
+  <h1 class="bab">BAB II<br/>Manual Book Aplikasi DOKEMAS</h1>
+
+  <h2 class="subbab">2.1 Pengenalan Aplikasi</h2>
+  <p class="indent">
+    <strong>DOKEMAS</strong> (Dolan Keliling Banyumas) adalah aplikasi mobile berbasis Flutter
+    yang dirancang untuk membantu masyarakat dan wisatawan dalam menemukan, merencanakan, dan
+    menikmati destinasi wisata di wilayah Banyumas. Aplikasi terhubung secara real-time
+    dengan backend Laravel melalui REST API yang aman menggunakan token Sanctum.
+  </p>
+
+  <h2 class="subbab">2.2 Persyaratan Sistem</h2>
+  <table>
+    <thead>
+      <tr><th>Item</th><th>Kebutuhan</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Sistem Operasi</td><td>Android 6.0 (API 23) ke atas / iOS 12 ke atas</td></tr>
+      <tr><td>Koneksi Internet</td><td>Diperlukan untuk mengambil data destinasi &amp; gambar dari server</td></tr>
+      <tr><td>Akun</td><td>Diperlukan untuk fitur Wishlist, Itinerary, dan Review</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="subbab">2.3 Struktur Navigasi &amp; Peran Pengguna</h2>
+  <p class="indent">
+    Aplikasi memiliki dua alur utama berdasarkan peran pengguna:
+  </p>
+  <table>
+    <thead>
+      <tr><th>Peran</th><th>Alur Masuk</th><th>Fitur yang Tersedia</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Tamu (Guest)</strong></td>
+        <td>Splash → Main Screen (tanpa login)</td>
+        <td>Beranda, Explore, baca Detail Destinasi</td>
+      </tr>
+      <tr>
+        <td><strong>User</strong></td>
+        <td>Splash → Login → Main Screen</td>
+        <td>Semua fitur tamu + Wishlist, Itinerary, tulis Review, Profil</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>Splash → Login → Admin Panel</td>
+        <td>Dashboard statistik + CRUD Destinasi, Kategori, Fasilitas, User, Moderasi Review</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="subbab">2.4 Ringkasan Fitur Utama</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="no">No.</th>
+        <th>Fitur</th>
+        <th>Deskripsi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="no">1</td><td>Splash Screen</td><td>Layar pembuka yang mendeteksi status login otomatis &amp; mengarahkan ke halaman yang sesuai</td></tr>
+      <tr><td class="no">2</td><td>Login &amp; Register</td><td>Autentikasi dengan email &amp; password; mendukung reset password via OTP email</td></tr>
+      <tr><td class="no">3</td><td>Beranda (Home)</td><td>Destinasi populer, filter kategori (Alam, Kuliner, Keluarga, dll.), dan search bar</td></tr>
+      <tr><td class="no">4</td><td>Explore</td><td>Daftar lengkap destinasi dengan pencarian lanjutan dan filter multi-kriteria</td></tr>
+      <tr><td class="no">5</td><td>Detail Destinasi</td><td>Galeri foto, info lengkap, fasilitas, peta, dan ulasan pengguna</td></tr>
+      <tr><td class="no">6</td><td>Wishlist</td><td>Simpan &amp; kelola destinasi favorit (perlu login)</td></tr>
+      <tr><td class="no">7</td><td>Itinerary</td><td>Buat jadwal wisata dengan timeline tanggal dan destinasi (perlu login)</td></tr>
+      <tr><td class="no">8</td><td>Profil &amp; Pengaturan</td><td>Edit data diri, ganti password, riwayat itinerary, ulasan saya, logout</td></tr>
+      <tr><td class="no">9</td><td>Panel Admin</td><td>Dashboard statistik + CRUD konten aplikasi secara penuh</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     HALAMAN 4 – MANUAL BOOK: Autentikasi
+═══════════════════════════════════════════ -->
+<div class="page">
+  <h2 class="subbab">2.5 Panduan Penggunaan Per Fitur</h2>
+
+  <h3 class="subsubbab">2.5.1 Splash Screen &amp; Deteksi Login Otomatis</h3>
+  <p class="indent">
+    Saat aplikasi pertama kali dibuka, layar <em>splash screen</em> akan tampil selama ±2 detik
+    menampilkan logo DOKEMAS. Pada saat yang sama, aplikasi secara otomatis memeriksa token
+    login yang tersimpan di perangkat.
+  </p>
+  <div class="step-box">
+    <div class="step-title">Alur Otomatis:</div>
+    <ul>
+      <li>Token ditemukan &amp; role = <strong>admin</strong> &rarr; diarahkan ke <em>Admin Panel</em></li>
+      <li>Token ditemukan &amp; role = <strong>user</strong> &rarr; diarahkan ke <em>Beranda</em></li>
+      <li>Tidak ada token &rarr; masuk ke <em>Beranda</em> sebagai <strong>tamu (Guest)</strong></li>
+    </ul>
+  </div>
+
+  <h3 class="subsubbab">2.5.2 Registrasi Akun Baru</h3>
+  <p class="indent">
+    Pengguna baru dapat membuat akun melalui halaman Register yang diakses dari halaman Login.
+  </p>
+  <div class="step-box">
+    <div class="step-title">Langkah-langkah:</div>
+    <ul>
+      <li>Buka aplikasi &rarr; tap <strong>"Belum punya akun? Daftar"</strong> di halaman Login</li>
+      <li>Isi formulir: <strong>Nama Lengkap, Email, Password, Konfirmasi Password</strong></li>
+      <li>Tap tombol <strong>"Daftar"</strong> — sistem mengirim data ke server</li>
+      <li>Jika berhasil, pengguna otomatis diarahkan ke halaman Beranda</li>
+      <li>Jika gagal (mis. email sudah terdaftar), muncul pesan error di layar</li>
+    </ul>
+  </div>
+
+  <h3 class="subsubbab">2.5.3 Login</h3>
+  <p class="indent">
+    Pengguna yang sudah memiliki akun dapat masuk menggunakan email dan password.
+  </p>
+  <div class="step-box">
+    <div class="step-title">Langkah-langkah:</div>
+    <ul>
+      <li>Buka aplikasi &rarr; tap ikon profil di header, atau tab <strong>"Profil"</strong> di navigasi bawah</li>
+      <li>Masukkan <strong>Email</strong> dan <strong>Password</strong></li>
+      <li>Tap <strong>"Masuk"</strong> — loading indicator tampil saat proses</li>
+      <li>Berhasil: token tersimpan &rarr; masuk ke Beranda (user) atau Admin Panel (admin)</li>
+      <li>Gagal: pesan kesalahan ditampilkan di layar</li>
+    </ul>
+  </div>
+
+  <h3 class="subsubbab">2.5.4 Lupa Password (Reset via OTP)</h3>
+  <p class="indent">
+    Fitur reset password menggunakan kode One-Time Password (OTP) yang dikirimkan ke email terdaftar.
+  </p>
+  <div class="step-box">
+    <div class="step-title">Langkah-langkah:</div>
+    <ul>
+      <li>Di halaman Login &rarr; tap <strong>"Lupa Password?"</strong></li>
+      <li>Masukkan <strong>email</strong> yang terdaftar &rarr; tap <strong>"Kirim OTP"</strong></li>
+      <li>Buka inbox email &rarr; salin kode OTP 6 digit yang diterima</li>
+      <li>Masukkan kode OTP di halaman verifikasi &rarr; tap <strong>"Verifikasi"</strong></li>
+      <li>Masukkan <strong>password baru</strong> dan konfirmasinya &rarr; tap <strong>"Reset Password"</strong></li>
+      <li>Password berhasil diperbarui &rarr; diarahkan kembali ke halaman Login</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     HALAMAN 5 – MANUAL BOOK: Beranda & Explore & Detail
+═══════════════════════════════════════════ -->
+<div class="page">
+  <h3 class="subsubbab">2.5.5 Beranda (Home)</h3>
+  <p class="indent">
+    Halaman Beranda adalah tampilan utama yang menyajikan destinasi populer dan kategori wisata.
+    Data diambil secara real-time dari API.
+  </p>
+  <table>
+    <thead>
+      <tr><th>Elemen</th><th>Fungsi</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Header &amp; Avatar</td><td>Menampilkan nama &amp; foto profil pengguna; ikon notifikasi di kanan atas</td></tr>
+      <tr><td>Search Bar</td><td>Ketik nama destinasi &rarr; tekan Enter untuk membuka Explore dengan query tersebut</td></tr>
+      <tr><td>Chip Kategori</td><td>Filter cepat: Alam, Keluarga, Kuliner, Edukasi, Religi; tap untuk menyaring destinasi</td></tr>
+      <tr><td>Kartu Destinasi</td><td>Thumbnail, nama, rating, dan harga; tap kartu untuk membuka halaman Detail</td></tr>
+      <tr><td>Tombol "Lihat Semua"</td><td>Membuka halaman Explore dengan seluruh daftar destinasi</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsubbab">2.5.6 Halaman Explore</h3>
+  <p class="indent">
+    Explore menampilkan seluruh destinasi dengan pencarian lanjutan dan filter multi-kriteria.
+  </p>
+  <div class="step-box">
+    <div class="step-title">Cara Menggunakan Filter:</div>
+    <ul>
+      <li>Tap ikon filter di sebelah kanan search bar untuk membuka panel filter</li>
+      <li>Pilih <strong>Kategori</strong>: Semua / Alam / Kuliner / Keluarga / Edukasi / Religi</li>
+      <li>Pilih <strong>Rentang Harga</strong>: Gratis, &lt; Rp 50.000, Rp 50.000–100.000, dsb.</li>
+      <li>Pilih <strong>Rating Minimum</strong>: &ge; 4.0, &ge; 4.5, dsb.</li>
+      <li>Pilih <strong>Fasilitas</strong> yang diinginkan (Parkir, Toilet, WiFi, dll.) — multi-pilih</li>
+      <li>Tap <strong>"Terapkan Filter"</strong> untuk memperbarui hasil pencarian</li>
+      <li>Tap <strong>"Reset"</strong> untuk menghapus semua filter sekaligus</li>
+    </ul>
+  </div>
+
+  <h3 class="subsubbab">2.5.7 Detail Destinasi</h3>
+  <p class="indent">
+    Halaman ini menampilkan informasi lengkap sebuah destinasi wisata beserta fitur interaktif.
+  </p>
+  <table>
+    <thead>
+      <tr><th>Elemen</th><th>Fungsi</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Galeri Foto</td><td>Swipe horizontal untuk melihat semua foto; tap untuk fullscreen</td></tr>
+      <tr><td>Rating &amp; Ulasan</td><td>Rata-rata bintang dari semua review pengguna beserta jumlah ulasan</td></tr>
+      <tr><td>Info Dasar</td><td>Harga tiket, jam operasional, jarak dari pusat kota, dan alamat lokasi</td></tr>
+      <tr><td>Deskripsi</td><td>Teks deskripsi lengkap; tap <em>"Selengkapnya"</em> untuk membaca semua</td></tr>
+      <tr><td>Fasilitas</td><td>Ikon-ikon fasilitas yang tersedia (Parkir, Toilet, Musala, WiFi, dll.)</td></tr>
+      <tr><td>Tombol Wishlist (&hearts;)</td><td>Toggle simpan/hapus dari favorit; memerlukan login</td></tr>
+      <tr><td>Tambah ke Itinerary</td><td>Memasukkan destinasi ke rencana perjalanan; memerlukan login</td></tr>
+      <tr><td>Buka Peta</td><td>Membuka Google Maps atau aplikasi peta default di perangkat</td></tr>
+      <tr><td>Ulasan Pengguna</td><td>Daftar review dengan bintang &amp; komentar; user login dapat menulis ulasan baru</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     HALAMAN 6 – MANUAL BOOK: Wishlist, Itinerary, Profil
+═══════════════════════════════════════════ -->
+<div class="page">
+  <h3 class="subsubbab">2.5.8 Wishlist / Favorit</h3>
+  <p class="indent">
+    Fitur Wishlist memungkinkan pengguna menyimpan destinasi yang ingin dikunjungi.
+    <strong>Fitur ini hanya tersedia bagi pengguna yang sudah login.</strong>
+  </p>
+  <div class="step-box">
+    <div class="step-title">Cara Menggunakan:</div>
+    <ul>
+      <li>Di halaman Detail Destinasi &rarr; tap ikon hati (&hearts;) di pojok kanan atas</li>
+      <li>Ikon berubah menjadi hati terisi; destinasi masuk ke daftar Wishlist</li>
+      <li>Buka tab <strong>"Wishlist"</strong> di navigasi bawah untuk melihat semua favorit</li>
+      <li>Gunakan search bar di halaman Wishlist untuk mencari destinasi tertentu</li>
+      <li>Hapus: tap ikon hapus (&times;) pada kartu, atau toggle kembali ikon hati di halaman Detail</li>
+    </ul>
+  </div>
+
+  <h3 class="subsubbab">2.5.9 Itinerary (Rencana Perjalanan)</h3>
+  <p class="indent">
+    Itinerary membantu pengguna membuat jadwal perjalanan wisata yang terstruktur.
+    <strong>Fitur ini hanya tersedia bagi pengguna yang sudah login.</strong>
+  </p>
+  <div class="step-box">
+    <div class="step-title">Cara Membuat Itinerary Baru:</div>
+    <ul>
+      <li>Buka tab <strong>"Itinerary"</strong> di navigasi bawah</li>
+      <li>Tap tombol <strong>"+ Buat Itinerary"</strong></li>
+      <li>Isi judul (mis. "Liburan ke Baturraden") dan pilih tanggal mulai &amp; selesai</li>
+      <li>Tap <strong>"Simpan"</strong> — itinerary baru muncul di daftar</li>
+    </ul>
+  </div>
+  <div class="step-box">
+    <div class="step-title">Cara Menambahkan Destinasi ke Itinerary:</div>
+    <ul>
+      <li>Buka halaman <strong>Detail Destinasi</strong> &rarr; tap <strong>"Tambah ke Itinerary"</strong></li>
+      <li>Pilih itinerary yang diinginkan dari dialog yang muncul</li>
+      <li>Destinasi langsung masuk ke timeline itinerary yang dipilih</li>
+    </ul>
+  </div>
+  <div class="step-box">
+    <div class="step-title">Cara Mengelola Itinerary:</div>
+    <ul>
+      <li>Tap nama itinerary untuk membuka detail; destinasi ditampilkan dalam format timeline</li>
+      <li>Tap ikon edit &#9998; untuk mengubah judul atau tanggal itinerary</li>
+      <li>Tap ikon hapus pada item untuk menghapus satu destinasi dari itinerary</li>
+      <li>Tap tombol hapus itinerary untuk menghapus seluruh itinerary beserta isinya</li>
+    </ul>
+  </div>
+
+  <h3 class="subsubbab">2.5.10 Profil &amp; Pengaturan</h3>
+  <p class="indent">
+    Halaman Profil menampilkan informasi akun dan menyediakan akses ke berbagai pengaturan pengguna.
+  </p>
+  <table>
+    <thead>
+      <tr><th>Menu</th><th>Fungsi</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Edit Profil</td><td>Ubah nama, email, nomor telepon, dan foto avatar</td></tr>
+      <tr><td>Ganti Password</td><td>Ubah password dengan memasukkan password lama dan password baru</td></tr>
+      <tr><td>Riwayat Itinerary</td><td>Lihat seluruh itinerary yang pernah dibuat</td></tr>
+      <tr><td>Ulasan Saya</td><td>Lihat, edit, atau hapus ulasan yang pernah ditulis</td></tr>
+      <tr><td>Notifikasi</td><td>Toggle aktif/nonaktif notifikasi dari aplikasi</td></tr>
+      <tr><td>Keluar (Logout)</td><td>Menghapus token dari server &amp; perangkat; kembali ke mode tamu</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     HALAMAN 7 – MANUAL BOOK: Panel Admin
+═══════════════════════════════════════════ -->
+<div class="page">
+  <h3 class="subsubbab">2.5.11 Panel Admin</h3>
+  <p class="indent">
+    Panel Admin hanya dapat diakses oleh akun berperan <strong>admin</strong>. Panel ini
+    menyediakan pengelolaan konten aplikasi secara penuh melalui bottom navigation bar
+    dengan 5 tab utama.
+  </p>
+
+  <h3 class="subsubbab">Tab 1 – Dashboard</h3>
+  <p class="indent">Menampilkan ringkasan statistik aplikasi secara keseluruhan.</p>
+  <table>
+    <thead>
+      <tr><th>Informasi</th><th>Keterangan</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Total Destinasi</td><td>Jumlah keseluruhan destinasi yang terdaftar di sistem</td></tr>
+      <tr><td>Total User</td><td>Jumlah akun pengguna yang terdaftar</td></tr>
+      <tr><td>Total Review</td><td>Jumlah seluruh ulasan yang masuk dari pengguna</td></tr>
+      <tr><td>Top Rating</td><td>Daftar destinasi dengan nilai rating tertinggi</td></tr>
+    </tbody>
+  </table>
+  <p class="indent" style="margin-top:6px;">
+    FAB (Floating Action Button) di Dashboard bersifat <em>speed-dial</em>: tap untuk memunculkan
+    menu cepat tambah User, Kategori, Fasilitas, dan Destinasi sekaligus.
+  </p>
+
+  <h3 class="subsubbab">Tab 2 – Destinasi</h3>
+  <p class="indent">Mengelola seluruh data destinasi wisata (CRUD — Create, Read, Update, Delete).</p>
+  <div class="step-box">
+    <div class="step-title">Cara Menambah Destinasi:</div>
+    <ul>
+      <li>Tap tombol <strong>"+"</strong> atau FAB di tab Destinasi</li>
+      <li>Isi: Nama, Kategori, Deskripsi, Harga, Jam Buka, Lokasi, Jarak</li>
+      <li>Upload <strong>thumbnail</strong> (foto utama) dan <strong>galeri foto</strong> (multi)</li>
+      <li>Centang fasilitas yang tersedia &rarr; tap <strong>"Simpan"</strong></li>
+      <li>Foto dikonversi otomatis ke format <strong>WebP</strong> di server</li>
+    </ul>
+  </div>
+  <div class="step-box">
+    <div class="step-title">Cara Mengedit / Menghapus Destinasi:</div>
+    <ul>
+      <li>Cari destinasi &rarr; tap kartu untuk membuka opsi</li>
+      <li>Tap &#9998; untuk mengedit data, atau &#128465; untuk menghapus destinasi</li>
+      <li>Konfirmasi dialog hapus &rarr; destinasi dihapus dari sistem beserta foto-fotonya</li>
+    </ul>
+  </div>
+
+  <h3 class="subsubbab">Tab 3 – Kelola (Kategori, Fasilitas, User)</h3>
+  <table>
+    <thead>
+      <tr><th>Sub-Menu</th><th>Fungsi</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Kelola Kategori</strong></td><td>Tambah, edit, hapus kategori wisata (mis. Alam, Kuliner, Religi, dll.)</td></tr>
+      <tr><td><strong>Kelola Fasilitas</strong></td><td>Tambah, edit, hapus fasilitas (mis. Parkir, Toilet, WiFi, Musala)</td></tr>
+      <tr><td><strong>Kelola User</strong></td><td>Lihat daftar pengguna, ubah data, atau hapus akun pengguna</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsubbab">Tab 4 – Review</h3>
+  <p class="indent">
+    Halaman moderasi ulasan pengguna. Admin dapat melihat seluruh review dari semua destinasi
+    dan menghapus ulasan yang tidak sesuai dengan kebijakan aplikasi.
+  </p>
+
+  <h3 class="subsubbab">Tab 5 – Profil Admin</h3>
+  <p class="indent">
+    Sama dengan profil user biasa: edit data diri, ganti password, dan logout dari panel admin.
+  </p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     HALAMAN 8 – PENUTUP
+═══════════════════════════════════════════ -->
+<div class="page">
+  <h1 class="bab">BAB III<br/>Penutup</h1>
+
+  <h2 class="subbab">3.1 Kesimpulan</h2>
+  <p class="indent">
+    Aplikasi <strong>DOKEMAS (Dolan Keliling Banyumas)</strong> berhasil dikembangkan sebagai
+    solusi digital untuk promosi dan navigasi pariwisata daerah Banyumas. Dengan mengintegrasikan
+    teknologi <em>Flutter</em> pada sisi mobile dan <em>Laravel 13</em> pada sisi backend,
+    aplikasi mampu menyajikan informasi destinasi wisata secara real-time, lengkap dengan fitur
+    perencanaan perjalanan (itinerary), manajemen favorit (wishlist), sistem ulasan pengguna,
+    serta panel administrasi yang komprehensif.
+  </p>
+  <p class="indent">
+    Setiap anggota kelompok telah memberikan kontribusi nyata sesuai pembagian tugas yang
+    disepakati, mulai dari pengembangan backend API, desain antarmuka pengguna, integrasi
+    fitur, hingga pengujian aplikasi secara menyeluruh.
+  </p>
+
+  <h2 class="subbab">3.2 Saran Pengembangan</h2>
+  <p class="indent">
+    Untuk pengembangan lebih lanjut, beberapa fitur yang dapat ditambahkan antara lain:
+  </p>
+  <table>
+    <thead>
+      <tr><th class="no">No.</th><th>Saran</th><th>Keterangan</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="no">1</td><td>Peta Interaktif</td><td>Integrasi Google Maps SDK untuk menampilkan lokasi destinasi secara visual di dalam aplikasi</td></tr>
+      <tr><td class="no">2</td><td>Notifikasi Push</td><td>Pengingat jadwal itinerary menggunakan Firebase Cloud Messaging (FCM)</td></tr>
+      <tr><td class="no">3</td><td>Mode Offline</td><td>Cache data destinasi menggunakan SQLite agar dapat dibuka tanpa koneksi internet</td></tr>
+      <tr><td class="no">4</td><td>Berbagi Itinerary</td><td>Fitur <em>share link</em> rencana perjalanan ke sesama pengguna atau media sosial</td></tr>
+      <tr><td class="no">5</td><td>Pemesanan Tiket</td><td>Integrasi sistem pemesanan tiket masuk destinasi secara online langsung dari aplikasi</td></tr>
+    </tbody>
+  </table>
+
+  <br/><br/><br/>
+  <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;"/>
+  <p style="text-align:center; font-size: 10.5pt; color: #555;">
+    Laporan ini dibuat sebagai bagian dari tugas mata kuliah <strong>Pemrograman Mobile</strong><br/>
+    &copy; 2026 &nbsp;|&nbsp; Kelompok [Nomor] &nbsp;|&nbsp; [Nama Universitas / Program Studi]
+  </p>
+</div>
+
+</body>
+</html>
