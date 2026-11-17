@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'beranda.dart';
-import 'explore_page.dart';
-import 'wishlist_page.dart';
-import 'user/itinerary/itinerary_list_page.dart';
-import 'user/profile/profile_page.dart';
-import 'guest/guest_wishlist_page.dart';
-import 'guest/guest_itinerary_page.dart';
-import 'guest/guest_profile_page.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/wishlist_provider.dart';
+import 'beranda.dart';
+import 'explore_page.dart';
+import 'guest/guest_itinerary_page.dart';
+import 'guest/guest_profile_page.dart';
+import 'guest/guest_wishlist_page.dart';
+import 'user/itinerary/itinerary_list_page.dart';
+import 'user/profile/profile_page.dart';
+import 'wishlist_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -40,56 +40,78 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Dengarkan perubahan status login dari AuthProvider
     final bool isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
 
     final List<Widget> pages = isLoggedIn
         ? [
-            HomePage(onTabChanged: _switchTab), // Index 0 (Home)
-            const ExplorePage(), // Index 1 (Explore)
-            const WishlistPage(), // Index 2 (Favorite/Wishlist)
-            const ItineraryListPage(), // Index 3 (Itinerary)
-            const ProfilePage(), // Index 4 (Profile)
+            HomePage(onTabChanged: _switchTab),
+            const ExplorePage(),
+            const WishlistPage(),
+            const ItineraryListPage(),
+            const ProfilePage(),
           ]
         : [
-            HomePage(onTabChanged: _switchTab), // Index 0 (Home)
-            const ExplorePage(), // Index 1 (Explore)
-            const GuestWishlistPage(), // Index 2 (Guest Wishlist)
-            const GuestItineraryPage(), // Index 3 (Guest Itinerary)
-            const GuestProfilePage(), // Index 4 (Guest Profile)
+            HomePage(onTabChanged: _switchTab),
+            const ExplorePage(),
+            const GuestWishlistPage(),
+            const GuestItineraryPage(),
+            const GuestProfilePage(),
           ];
 
     return Scaffold(
-      // Body akan otomatis berubah mengikuti tombol yang ditekan
       body: pages[_currentIndex],
-
-      // Bottom Navigation Bar tunggal yang mengontrol semua halaman
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xff028090),
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        currentIndex: _currentIndex, // Index halaman aktif saat ini
-        onTap: _switchTab,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Explore'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: 'Wishlist',
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month_outlined),
-            label: 'Itinerary',
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          selectedItemColor: const Color(0xFF1E6F1D),
+          unselectedItemColor: const Color(0xFF64748B),
+          showUnselectedLabels: true,
+          selectedLabelStyle: const TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w500,
           ),
-        ],
+          currentIndex: _currentIndex,
+          onTap: _switchTab,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home_rounded),
+              label: 'Beranda',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.explore_outlined),
+              activeIcon: Icon(Icons.explore_rounded),
+              label: 'Eksplor',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border_rounded),
+              activeIcon: Icon(Icons.favorite_rounded),
+              label: 'Favorit',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month_outlined),
+              activeIcon: Icon(Icons.calendar_month_rounded),
+              label: 'Rencana',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline_rounded),
+              activeIcon: Icon(Icons.person_rounded),
+              label: 'Profil',
+            ),
+          ],
+        ),
       ),
     );
   }

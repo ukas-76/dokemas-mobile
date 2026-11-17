@@ -24,6 +24,7 @@ class AppTheme {
 
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
+        surfaceTintColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 1,
@@ -36,7 +37,7 @@ class AppTheme {
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radius),
+          borderRadius: BorderRadius.circular(18),
           side: const BorderSide(color: AppColors.border),
         ),
         margin: EdgeInsets.zero,
@@ -52,7 +53,7 @@ class AppTheme {
             vertical: AppSpacing.md,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            borderRadius: BorderRadius.circular(14),
           ),
           textStyle: AppTextStyles.button,
         ),
@@ -60,21 +61,21 @@ class AppTheme {
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.background,
+        fillColor: const Color(0xFFF6F8FC),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.md,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         hintStyle: const TextStyle(color: AppColors.textMuted),

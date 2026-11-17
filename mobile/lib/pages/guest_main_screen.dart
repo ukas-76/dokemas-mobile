@@ -26,47 +26,67 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
-      HomePage(onTabChanged: _switchTab), // 0 Home
-      const ExplorePage(),                // 1 Explore
-      const GuestWishlistPage(),          // 2 Wishlist (gated)
-      const GuestItineraryPage(),         // 3 Itinerary (gated)
-      const GuestProfilePage(),           // 4 Profile (gated)
+      HomePage(onTabChanged: _switchTab),
+      const ExplorePage(),
+      const GuestWishlistPage(),
+      const GuestItineraryPage(),
+      const GuestProfilePage(),
     ];
 
     return Scaffold(
       body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xff028090),
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        currentIndex: _currentIndex,
-        onTap: _switchTab,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Explore',
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          selectedItemColor: const Color(0xFF1E6F1D),
+          unselectedItemColor: const Color(0xFF64748B),
+          showUnselectedLabels: true,
+          selectedLabelStyle: const TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: 'Wishlist',
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w500,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month_outlined),
-            label: 'Itinerary',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
-          ),
-        ],
+          currentIndex: _currentIndex,
+          onTap: _switchTab,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home_rounded),
+              label: 'Beranda',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.explore_outlined),
+              activeIcon: Icon(Icons.explore_rounded),
+              label: 'Eksplor',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border_rounded),
+              activeIcon: Icon(Icons.favorite_rounded),
+              label: 'Favorit',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month_outlined),
+              activeIcon: Icon(Icons.calendar_month_rounded),
+              label: 'Rencana',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline_rounded),
+              activeIcon: Icon(Icons.person_rounded),
+              label: 'Profil',
+            ),
+          ],
+        ),
       ),
     );
   }

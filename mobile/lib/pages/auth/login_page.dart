@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
-import '../../theme/app_text_styles.dart';
-
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/dokemas_logo.dart';
 import '../main_screen.dart';
 import '../admin/admin_shell.dart';
 import 'register_page.dart';
@@ -45,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
         context: context,
         barrierDismissible: false,
         builder: (context) => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
+          child: CircularProgressIndicator(color: Color(0xFF1E6F1D)),
         ),
       );
 
@@ -54,18 +51,15 @@ class _LoginPageState extends State<LoginPage> {
       navigator.pop(); // Tutup Loading
 
       if (errorMessage == null) {
-        // --- TAMBAHKAN LOGIKA DI SINI ---
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
-        // Simpan nama user dari data user yang didapat dari authProvider
         await prefs.setString('userName', authProvider.user?.name ?? 'User');
-        // --------------------------------
 
         if (authProvider.user?.role == 'admin') {
           scaffoldMessenger.showSnackBar(
             const SnackBar(
               content: Text('Login sukses sebagai Admin!'),
-              backgroundColor: AppColors.success,
+              backgroundColor: Color(0xFF16A34A),
               duration: Duration(seconds: 2),
             ),
           );
@@ -77,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
           scaffoldMessenger.showSnackBar(
             const SnackBar(
               content: Text('Login sukses!'),
-              backgroundColor: AppColors.success,
+              backgroundColor: Color(0xFF16A34A),
               duration: Duration(seconds: 2),
             ),
           );
@@ -89,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text(errorMessage), // Tampilkan pesan error asli dari API
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
           ),
         );
@@ -99,351 +93,531 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    const primaryGreen = Color(0xFF1E6F1D);
+    const inputFillColor = Color(0xFFF6F8FC);
+    const borderColor = Color(0xFFE2E8F0);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
+          },
+        ),
+        centerTitle: true,
+        title: const Text(
+          'Login',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF0F172A),
+          ),
+        ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: Center(
+              child: DokemasLogo(
+                width: 28,
+                height: 28,
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Form(
+            key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: AppSpacing.lg),
-                // Card Utama
-                Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
+                const SizedBox(height: 12),
+
+                // Logo Card with Mini Compass Badge
+                Center(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 92,
+                        height: 92,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: DokemasLogo(
+                            width: 60,
+                            height: 60,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1B6419),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.explore,
+                              size: 13,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+
+                const SizedBox(height: 14),
+
+                // Brand Name & Slogan
+                const Text(
+                  'DOKEMAS',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2.0,
+                    color: Color(0xFF0F2444),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'DOLAN KELILING BANYUMAS',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.4,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Greeting Headline
+                const Text(
+                  'Selamat Datang Kembali 👋',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F172A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Masuk untuk melanjutkan rencana liburanmu\nkeindahan lereng Slamet.',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF64748B),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 28),
+
+                // Email / Phone Field
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Email atau Nomor Telepon',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1E293B),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(fontSize: 14, color: Color(0xFF1E293B)),
+                  decoration: InputDecoration(
+                    hintText: 'nama@email.com atau 0812...',
+                    hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                    filled: true,
+                    fillColor: inputFillColor,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                    prefixIcon: const Icon(
+                      Icons.alternate_email,
+                      size: 20,
+                      color: Color(0xFF64748B),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: borderColor, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: primaryGreen, width: 1.5),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Email atau nomor telepon tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 18),
+
+                // Password Field
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Kata Sandi',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1E293B),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  style: const TextStyle(fontSize: 14, color: Color(0xFF1E293B)),
+                  decoration: InputDecoration(
+                    hintText: '••••••••••••',
+                    hintStyle: const TextStyle(fontSize: 14, color: Color(0xFF94A3B8)),
+                    filled: true,
+                    fillColor: inputFillColor,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                    prefixIcon: const Icon(
+                      Icons.lock_outline_rounded,
+                      size: 20,
+                      color: Color(0xFF64748B),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        size: 20,
+                        color: const Color(0xFF64748B),
+                      ),
+                      onPressed: () {
+                        setState(() => _obscurePassword = !_obscurePassword);
+                      },
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: borderColor, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: primaryGreen, width: 1.5),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Password tidak boleh kosong';
+                    }
+                    if (value.length < 8) {
+                      return 'Password minimal 8 karakter';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 12),
+
+                // Forgot Password Link
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordPage(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Lupa Password?',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: primaryGreen,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Primary Button ("Masuk ->")
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _handleSignIn,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryGreen,
+                      elevation: 3,
+                      shadowColor: primaryGreen.withValues(alpha: 0.4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Tombol Back
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: AppColors.primary,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ),
-                        // Logo Bulat Minimalis
-                        Center(
-                          child: Container(
-                            width: 64,
-                            height: 64,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.terrain, // Ikon Gunung/Alam untuk Dokemas
-                              color: AppColors.primary,
-                              size: 32,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-
-                        // Judul & Sub-judul
-                        Center(
-                          child: Text(
-                            'Explore Purwokerto',
-                            style: AppTextStyles.heading1.copyWith(
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Center(
-                          child: Text(
-                            'Your guided serenity awaits.',
-                            style: AppTextStyles.caption.copyWith(fontSize: 13),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Switcher User/Admin dihilangkan karena sekarang berdasarkan Role dari Backend
-
-                        // Input Email
                         Text(
-                          'Email',
-                          style: AppTextStyles.title.copyWith(fontSize: 13),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            hintText: 'user@dokemas.test',
-                            prefixIcon: Icon(
-                              Icons.email_outlined,
-                              size: 20,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Email tidak boleh kosong';
-                            }
-                            if (!RegExp(
-                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                            ).hasMatch(value)) {
-                              return 'Format email tidak valid';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-
-                        // Input Password
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Password',
-                              style: AppTextStyles.title.copyWith(fontSize: 13),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ForgotPasswordPage(),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                'Forgot?',
-                                style: AppTextStyles.title.copyWith(
-                                  fontSize: 12,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            hintText: 'password',
-                            prefixIcon: const Icon(
-                              Icons.lock_outline,
-                              size: 20,
-                              color: AppColors.textSecondary,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                size: 20,
-                                color: AppColors.textSecondary,
-                              ),
-                              onPressed: () {
-                                setState(
-                                  () => _obscurePassword = !_obscurePassword,
-                                );
-                              },
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Password tidak boleh kosong';
-                            }
-                            if (value.length < 8) {
-                              return 'Password minimal 8 karakter';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Tombol Sign In
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _handleSignIn,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusSm,
-                                ),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Sign In',
-                                  style: AppTextStyles.button.copyWith(
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(Icons.arrow_forward, size: 18),
-                              ],
-                            ),
+                          'Masuk',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.md),
-
-                        // Divider OR
-                        Row(
-                          children: [
-                            const Expanded(child: Divider()),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md,
-                              ),
-                              child: Text(
-                                'OR',
-                                style: AppTextStyles.caption.copyWith(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ),
-                            const Expanded(child: Divider()),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-
-                        // Tombol Google
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Simulasi Login via Google...'),
-                                ),
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.border),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusSm,
-                                ),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Google Logo G colored letter
-                                RichText(
-                                  text: const TextSpan(
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Roboto',
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: 'G',
-                                        style: TextStyle(
-                                          color: Color(0xFF4285F4),
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'o',
-                                        style: TextStyle(
-                                          color: Color(0xFFEA4335),
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'o',
-                                        style: TextStyle(
-                                          color: Color(0xFFFBBC05),
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'g',
-                                        style: TextStyle(
-                                          color: Color(0xFF4285F4),
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'l',
-                                        style: TextStyle(
-                                          color: Color(0xFF34A853),
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'e',
-                                        style: TextStyle(
-                                          color: Color(0xFFEA4335),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Google',
-                                  style: AppTextStyles.title.copyWith(
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Footer
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account? ",
-                              style: AppTextStyles.caption,
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const RegisterPage(),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                'Sign up',
-                                style: AppTextStyles.caption.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                          ],
+                        SizedBox(width: 8),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 18,
+                          color: Colors.white,
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+
+                const SizedBox(height: 24),
+
+                // Divider ("Atau masuk dengan")
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Divider(color: borderColor, thickness: 1),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: Text(
+                        'Atau masuk dengan',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
+                    ),
+                    const Expanded(
+                      child: Divider(color: borderColor, thickness: 1),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Social Login Buttons (Google & Apple)
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Simulasi Login via Google...'),
+                              ),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: inputFillColor,
+                            side: const BorderSide(color: borderColor),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RichText(
+                                text: const TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Roboto',
+                                  ),
+                                  children: [
+                                    TextSpan(text: 'G', style: TextStyle(color: Color(0xFF4285F4))),
+                                    TextSpan(text: 'o', style: TextStyle(color: Color(0xFFEA4335))),
+                                    TextSpan(text: 'o', style: TextStyle(color: Color(0xFFFBBC05))),
+                                    TextSpan(text: 'g', style: TextStyle(color: Color(0xFF4285F4))),
+                                    TextSpan(text: 'l', style: TextStyle(color: Color(0xFF34A853))),
+                                    TextSpan(text: 'e', style: TextStyle(color: Color(0xFFEA4335))),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Google',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1E293B),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: SizedBox(
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Simulasi Login via Apple...'),
+                              ),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: inputFillColor,
+                            side: const BorderSide(color: borderColor),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.apple,
+                                size: 20,
+                                color: Color(0xFF0F172A),
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Apple',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1E293B),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 28),
+
+                // Register Link
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Belum punya akun? ',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterPage(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Daftar sekarang',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: primaryGreen,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 32),
+
+                // Banyumas Tourism Integrated Footer
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.verified_user_outlined,
+                      size: 15,
+                      color: Color(0xFF16A34A),
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      'Terintegrasi Layanan Wisata Banyumas',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF475569),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Dilindungi enkripsi Dinporabudpar Kabupaten Banyumas',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF94A3B8),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 24),
               ],
             ),
           ),

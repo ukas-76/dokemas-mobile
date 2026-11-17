@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
-import '../../theme/app_text_styles.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/dokemas_logo.dart';
 import 'otp_verification_page.dart';
-
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -28,18 +25,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Future<void> _handleSendInstructions() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      
+
       final email = _emailController.text.trim();
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      
+
       final error = await authProvider.forgotPassword(email);
-      
+
       setState(() => _isLoading = false);
-      
+
       if (!mounted) return;
 
       if (error == null) {
-        // Berhasil, pindah ke halaman verifikasi OTP
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -50,7 +46,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(error),
-            backgroundColor: AppColors.danger,
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -59,161 +55,178 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    const primaryGreen = Color(0xFF1E6F1D);
+    const inputFillColor = Color(0xFFF6F8FC);
+    const borderColor = Color(0xFFE2E8F0);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: const Text(
+          'Lupa Kata Sandi',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF0F172A),
+          ),
+        ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: Center(
+              child: DokemasLogo(width: 28, height: 28),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Form(
+            key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: AppSpacing.lg),
-                // Card Utama
+                const SizedBox(height: 16),
                 Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  width: 84,
+                  height: 84,
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    color: primaryGreen.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
                   ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Tombol Back di kiri atas card
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        
-                        // Logo Bulat Minimalis dengan Ikon Kunci/Lock Reset
-                        Center(
-                          child: Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.08),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.lock_reset, // Ikon gembok dengan lingkaran tanda panah
-                              color: AppColors.primary,
-                              size: 40,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-
-                        // Judul & Sub-judul
-                        Center(
-                          child: Text(
-                            'Lupa Kata Sandi?',
-                            style: AppTextStyles.heading1.copyWith(color: AppColors.primary),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                            child: Text(
-                              'Masukkan email Anda untuk menerima instruksi pemulihan kata sandi',
-                              textAlign: TextAlign.center,
-                              style: AppTextStyles.caption.copyWith(fontSize: 13),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Input Email Address
-                        Text(
-                          'Email Address',
-                          style: AppTextStyles.title.copyWith(fontSize: 13),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            hintText: 'nama@email.com',
-                            prefixIcon: Icon(Icons.email_outlined, size: 20, color: AppColors.textSecondary),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Email tidak boleh kosong';
-                            }
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                              return 'Format email tidak valid';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.xl),
-
-                        // Tombol Kirim Instruksi
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleSendInstructions,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                              ),
-                            ),
-                            child: _isLoading 
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                  )
-                                : Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Kirim Instruksi',
-                                        style: AppTextStyles.button.copyWith(fontSize: 15),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Icon(Icons.play_arrow_outlined, size: 18),
-                                    ],
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xl),
-
-                        // Footer Kembali ke Login
-                        Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              '← Kembali ke Login',
-                              style: AppTextStyles.caption.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                      ],
+                  child: const Icon(
+                    Icons.lock_reset_rounded,
+                    color: primaryGreen,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 22),
+                const Text(
+                  'Pulihkan Kata Sandi',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F172A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Masukkan alamat email Anda untuk menerima\nkode OTP pemulihan kata sandi.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF64748B),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Email',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1E293B),
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(fontSize: 14, color: Color(0xFF1E293B)),
+                  decoration: InputDecoration(
+                    hintText: 'nama@email.com',
+                    hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                    filled: true,
+                    fillColor: inputFillColor,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                    prefixIcon: const Icon(
+                      Icons.mail_outline_rounded,
+                      size: 20,
+                      color: Color(0xFF64748B),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: borderColor, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: primaryGreen, width: 1.5),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email tidak boleh kosong';
+                    }
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      return 'Format email tidak valid';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 26),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handleSendInstructions,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryGreen,
+                      elevation: 3,
+                      shadowColor: primaryGreen.withValues(alpha: 0.4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Kirim Instruksi',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
+                            ],
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Text(
+                    '← Kembali ke Login',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: primaryGreen,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

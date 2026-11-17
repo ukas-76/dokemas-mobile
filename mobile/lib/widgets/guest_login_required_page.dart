@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
 import '../pages/auth/login_page.dart';
 import '../pages/auth/register_page.dart';
+import 'dokemas_top_header.dart';
 
 /// Konten "harus login" buat tab guest yang ke-gate (wishlist/itinerary/profile).
-/// Navbar disediakan oleh shell (GuestMainScreen), bukan di sini.
+/// Navbar disediakan oleh shell (MainScreen/GuestMainScreen), bukan di sini.
 class GuestLoginRequiredPage extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -33,133 +33,155 @@ class GuestLoginRequiredPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const primaryGreen = Color(0xFF1E6F1D);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: const DokemasTopHeader(),
       body: SafeArea(
+        top: false,
         child: Center(
           child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 22, vertical: 32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxWidth: 400),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: const Color(0xFFE2E8F0).withValues(alpha: 0.8),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
                     children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          width: 96,
-                          height: 96,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.12),
-                            shape: BoxShape.circle,
-                          ),
+                      Container(
+                        width: 92,
+                        height: 92,
+                        decoration: BoxDecoration(
+                          color: primaryGreen.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
                         ),
-                        Icon(
+                        child: Icon(
                           icon,
-                          size: 43,
-                          color: AppColors.primary,
-                        ),
-                        Positioned(
-                          top: 5,
-                          right: 4,
-                          child: Container(
-                            width: 19,
-                            height: 19,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primaryLight,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.star,
-                              color: AppColors.onPrimary,
-                              size: 10,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 40),
-                    Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      description,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        height: 1.55,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: () => _openLogin(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.onPrimary,
-                          elevation: 5,
-                          shadowColor: Colors.black26,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Masuk',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward, size: 17),
-                          ],
+                          size: 42,
+                          color: primaryGreen,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 13),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Belum punya akun? ',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF071B34),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: const Icon(
+                            Icons.lock_outline_rounded,
+                            color: Color(0xFF4ADE80),
+                            size: 12,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () => _openRegister(context),
-                          child: const Text(
-                            'Daftar',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 26),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    description,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 26),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () => _openLogin(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryGreen,
+                        foregroundColor: Colors.white,
+                        elevation: 2,
+                        shadowColor: primaryGreen.withValues(alpha: 0.35),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Masuk',
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward_rounded, size: 18),
+                        ],
+                      ),
                     ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Belum punya akun? ',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => _openRegister(context),
+                        child: const Text(
+                          'Daftar sekarang',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: primaryGreen,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
         ),
+      ),
     );
   }
 }

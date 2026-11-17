@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Brand
-  static const Color primary = Color(0xFF0F766E); // teal hijau utama
-  static const Color primaryDark = Color(0xFF115E56);
-  static const Color primaryLight = Color(0xFF5EAFA6);
-  static const Color accent = Color(0xFFF59E0B); // oranye aksen (logo Amikom)
+  // Brand (Deep Navy & Forest Green DOKEMAS)
+  static const Color primary = Color(0xFF1E6F1D); // Forest Green utama
+  static const Color primaryDark = Color(0xFF071B34); // Deep Navy
+  static const Color primaryLight = Color(0xFF4ADE80); // Bright Mint Green
+  static const Color accent = Color(0xFFF59E0B); // oranye aksen
 
   // Netral / latar
-  static const Color background = Color(0xFFF6F8F9);
+  static const Color background = Color(0xFFF8FAFC);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color border = Color(0xFFE2E8F0);
 
   // Teks
-  static const Color textPrimary = Color(0xFF1E293B);
+  static const Color textPrimary = Color(0xFF0F172A);
   static const Color textSecondary = Color(0xFF64748B);
   static const Color textMuted = Color(0xFF94A3B8);
   static const Color onPrimary = Color(0xFFFFFFFF);

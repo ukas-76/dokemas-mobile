@@ -50,12 +50,12 @@ Future<Map<String, dynamic>?> showFilterBottomSheet(
                   children: [
                     const Text(
                       'Filter',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xff063940)),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                      style: IconButton.styleFrom(backgroundColor: const Color(0xffe8f1f2), iconSize: 20),
+                      icon: const Icon(Icons.close, color: Color(0xFF0F172A)),
+                      style: IconButton.styleFrom(backgroundColor: const Color(0xFFF1F5F9), iconSize: 20),
                     ),
                   ],
                 ),
@@ -134,7 +134,7 @@ Future<Map<String, dynamic>?> showFilterBottomSheet(
                           selectedFasilitas.clear();
                         });
                       },
-                      child: const Text('Reset', style: TextStyle(color: Color(0xff00a896), fontWeight: FontWeight.bold)),
+                      child: const Text('Reset', style: TextStyle(color: Color(0xFF1E6F1D), fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(width: 20),
                     Expanded(
@@ -149,9 +149,9 @@ Future<Map<String, dynamic>?> showFilterBottomSheet(
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff028090),
+                          backgroundColor: const Color(0xFF1E6F1D),
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         child: const Text('Terapkan Filter', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
@@ -172,7 +172,7 @@ Future<Map<String, dynamic>?> showFilterBottomSheet(
 Widget _buildFilterTitle(String title) {
   return Padding(
     padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
-    child: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xff063940))),
+    child: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
   );
 }
 
@@ -196,15 +196,16 @@ Widget _buildFilterChip({required String label, required bool isSelected, requir
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xff028090) : const Color(0xffe8f1f2),
+        color: isSelected ? const Color(0xFF1E6F1D) : const Color(0xFFF6F8FC),
+        border: Border.all(color: isSelected ? const Color(0xFF1E6F1D) : const Color(0xFFE2E8F0)),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 13,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.white : const Color(0xff063940),
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          color: isSelected ? Colors.white : const Color(0xFF1E293B),
         ),
       ),
     ),

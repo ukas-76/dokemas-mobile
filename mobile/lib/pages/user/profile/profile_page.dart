@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../components/global_header.dart';
-
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_text_styles.dart';
+import '../../../widgets/dokemas_top_header.dart';
 import 'edit_profile_page.dart';
 import 'riwayat_itinerary_page.dart';
 import 'change_password_page.dart';
@@ -114,91 +113,108 @@ class _ProfilePageState extends State<ProfilePage> {
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
 
+    final avatarUrl = user?.avatarUrl;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const GlobalHeader(),
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: const DokemasTopHeader(),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.md,
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Deep Navy Profile Header Card
             Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                border: Border.all(
-                  color: AppColors.border.withValues(alpha: 0.5),
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 26),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF061B34),
+                    Color(0xFF0A2748),
+                    Color(0xFF051529),
+                  ],
+                ),
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(28),
                 ),
               ),
-              child: Center(
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.15),
-                          width: 4,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: CircleAvatar(
-                        radius: 46,
-                        backgroundImage: NetworkImage(
-                          user?.avatarUrl ??
-                              'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop',
-                        ),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF4ADE80).withValues(alpha: 0.65),
+                        width: 3,
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(
-                      user?.name ?? 'Guest',
-                      style: AppTextStyles.heading2.copyWith(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: CircleAvatar(
+                      radius: 44,
+                      backgroundColor: Colors.white.withValues(alpha: 0.14),
+                      backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
+                          ? NetworkImage(avatarUrl)
+                          : null,
+                      child: (avatarUrl == null || avatarUrl.isEmpty)
+                          ? const Icon(
+                              Icons.person_rounded,
+                              size: 44,
+                              color: Colors.white,
+                            )
+                          : null,
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    user?.name ?? 'Guest',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
                           Icons.email_outlined,
-                          color: AppColors.textSecondary,
-                          size: 16,
+                          color: Color(0xFF4ADE80),
+                          size: 14,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 6),
                         Text(
                           user?.email ?? 'Belum ada email',
-                          style: AppTextStyles.body.copyWith(
-                            color: AppColors.textSecondary,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFE2E8F0),
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
 
             _SettingsSection(
               title: 'AKUN SAYA',
@@ -382,6 +398,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
+                ],
+              ),
+            ),
           ],
         ),
       ),

@@ -3,9 +3,9 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_text_styles.dart';
 import 'package:provider/provider.dart';
-import '../../../components/global_header.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/itinerary_provider.dart';
+import '../../../widgets/dokemas_top_header.dart';
 import 'itinerary_detail_page.dart';
 
 class ItineraryListPage extends StatefulWidget {
@@ -542,47 +542,107 @@ class _ItineraryListPageState extends State<ItineraryListPage> {
     final errorMessage = itineraryProvider.errorMessage;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const GlobalHeader(),
-      floatingActionButton: FloatingActionButton(
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: const DokemasTopHeader(),
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddItineraryModal(context),
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: AppColors.onPrimary),
+        backgroundColor: const Color(0xFF1E6F1D),
+        foregroundColor: Colors.white,
+        elevation: 3,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text(
+          'Buat Rencana',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
           _loadItineraries();
         },
-        color: AppColors.primary,
+        color: const Color(0xFF1E6F1D),
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: EdgeInsets.zero,
           children: [
-            // Header section
-            Text(
-              'Rencana Perjalanan',
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.5,
+            // Dark Navy Hero Banner aligned with Beranda & Eksplor
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF061B34),
+                    Color(0xFF0A2748),
+                    Color(0xFF051529),
+                  ],
+                ),
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.12),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.calendar_month_rounded,
+                          size: 13,
+                          color: Color(0xFF4ADE80),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${itineraries.length} Rencana Tersimpan',
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Itinerary Saya',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Kelola jadwal dan rencana liburanmu di Banyumas',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFFCBD5E1),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Itinerary Saya',
-              style: AppTextStyles.heading1.copyWith(
-                color: const Color(0xFF0F172A),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Kelola dan lihat rencana perjalananmu',
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: 18),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
 
             // Loading state
             if (isLoading && itineraries.isEmpty)
@@ -885,7 +945,7 @@ class _ItineraryListPageState extends State<ItineraryListPage> {
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        'Tap tombol + untuk mulai membuat itinerary',
+                        'Tap tombol + Buat Rencana untuk mulai membuat itinerary',
                         style: AppTextStyles.caption.copyWith(
                           color: AppColors.textMuted,
                         ),
@@ -894,6 +954,10 @@ class _ItineraryListPageState extends State<ItineraryListPage> {
                   ),
                 ),
               ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 80),
           ],
         ),
       ),
