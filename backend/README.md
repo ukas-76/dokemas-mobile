@@ -21,6 +21,7 @@ DB di `.env`: `DB_DATABASE=dokemas`, `DB_USERNAME=root`, `DB_PASSWORD=` (Laragon
 | Role  | Email                | Password   |
 |-------|----------------------|------------|
 | admin | admin@dokemas.test   | password   |
+| mitra | mitra@dokemas.test   | password   |
 | user  | user@dokemas.test    | password   |
 
 ## Auth (Sanctum)

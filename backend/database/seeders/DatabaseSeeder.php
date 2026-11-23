@@ -29,6 +29,30 @@ class DatabaseSeeder extends Seeder
             'role' => 'user',
         ]);
 
+        $mitraUser = User::create([
+            'name' => 'Mitra Baturraden',
+            'email' => 'mitra@dokemas.test',
+            'phone' => '081234567890',
+            'password' => Hash::make('password'),
+            'role' => 'mitra',
+        ]);
+
+        \App\Models\MitraProfile::create([
+            'user_id' => $mitraUser->id,
+            'nik' => '3302123456780001',
+            'entity_type' => 'Perorangan',
+            'position' => 'Pengelola Utama',
+            'nib' => '1289000451234',
+            'npwp' => '08.123.456.7-521.000',
+            'environmental_permit' => 'SPPL (Surat Pernyataan Pengelolaan Lingkungan)',
+            'land_status' => 'Kerjasama Perhutani (PKS KPH Banyumas Timur)',
+            'bank_name' => 'Bank Jateng',
+            'bank_account_number' => '1002-3948-2819',
+            'bank_account_holder' => 'Hutan Pinus Limpakuwus Baturraden',
+            'verification_status' => 'verified',
+            'verified_at' => now(),
+        ]);
+
         // Categories
         $categories = collect([
             ['name' => 'Alam', 'icon' => 'forest'],

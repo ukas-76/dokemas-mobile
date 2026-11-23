@@ -12,9 +12,10 @@ use Illuminate\Support\Facades\Storage;
 class Destination extends Model
 {
     protected $fillable = [
-        'category_id', 'name', 'slug', 'description', 'address',
-        'latitude', 'longitude', 'price', 'opening_hours', 'phone',
-        'thumbnail', 'rating_avg', 'rating_count', 'is_popular',
+        'category_id', 'user_id', 'name', 'slug', 'description', 'address',
+        'district', 'access_directions', 'maps_url',
+        'latitude', 'longitude', 'price', 'opening_hours', 'phone', 'cs_phone',
+        'is_24_hours', 'thumbnail', 'rating_avg', 'rating_count', 'is_popular', 'status',
     ];
 
     protected $appends = ['thumbnail_url'];
@@ -32,7 +33,13 @@ class Destination extends Model
             'price' => 'float',
             'rating_avg' => 'float',
             'is_popular' => 'boolean',
+            'is_24_hours' => 'boolean',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function category(): BelongsTo

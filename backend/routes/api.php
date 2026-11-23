@@ -25,6 +25,9 @@ Route::get('login', function () {
 })->name('login');
 Route::post('login', [AuthController::class, 'login']);
 
+// Pendaftaran Mitra dari Website (Form 4 Langkah)
+Route::post('mitra/register', [\App\Http\Controllers\Api\MitraRegistrationController::class, 'register']);
+
 // Password Reset Routes
 Route::post('forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
 Route::post('verify-otp', [\App\Http\Controllers\Api\PasswordResetController::class, 'verifyOtp']);
@@ -62,6 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/toggle', [WishlistController::class, 'toggle']);
     Route::delete('wishlist/{destination}', [WishlistController::class, 'destroy']);
 
+    // Portal Mitra
+    Route::get('mitra/status', [\App\Http\Controllers\Api\MitraRegistrationController::class, 'status']);
+
     // Itineraries
     Route::apiResource('itineraries', ItineraryController::class);
     Route::post('itineraries/{itinerary}/items', [ItineraryController::class, 'addItem']);
@@ -86,6 +92,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('reviews/{review}/status', [\App\Http\Controllers\Api\Admin\ReviewController::class, 'updateStatus']);
         Route::delete('reviews/{review}', [\App\Http\Controllers\Api\Admin\ReviewController::class, 'destroy']);
 
+        // Manajemen Kemitraan (Kurasi Dinporabudpar)
+        Route::get('mitra-applications', [\App\Http\Controllers\Api\Admin\MitraManagementController::class, 'index']);
+        Route::get('mitra-applications/{id}', [\App\Http\Controllers\Api\Admin\MitraManagementController::class, 'show']);
+        Route::post('mitra-applications/{id}/approve', [\App\Http\Controllers\Api\Admin\MitraManagementController::class, 'approve']);
+        Route::post('mitra-applications/{id}/reject', [\App\Http\Controllers\Api\Admin\MitraManagementController::class, 'reject']);
 
         // Galeri foto destinasi (upload auto-convert ke WebP)
         Route::post('destinations/{destination}/images', [DestinationController::class, 'uploadImages']);

@@ -10,12 +10,13 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'role', 'avatar', 'google_id'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'role', 'avatar', 'google_id'])]
 #[Hidden(['password', 'remember_token'])]
 #[Appends(['avatar_url'])]
 class User extends Authenticatable
@@ -39,6 +40,21 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function isMitra(): bool
+    {
+        return $this->role === 'mitra';
+    }
+
+    public function mitraProfile(): HasOne
+    {
+        return $this->hasOne(MitraProfile::class);
+    }
+
+    public function destinations(): HasMany
+    {
+        return $this->hasMany(Destination::class);
     }
 
     public function reviews(): HasMany
