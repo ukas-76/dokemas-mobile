@@ -53,7 +53,8 @@ RUN apk add --no-cache \
     nginx supervisor \
     libpng libwebp libjpeg-turbo freetype \
     oniguruma \
-    curl
+    curl \
+    ca-certificates
 
 # Install PHP extensions dengan virtual build deps (dibersihkan setelah compile)
 RUN apk add --no-cache --virtual .build-deps \
