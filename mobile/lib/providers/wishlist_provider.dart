@@ -13,11 +13,7 @@ class WishlistProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Map<String, String> _authHeaders(String token) => {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      };
+  Map<String, String> _authHeaders(String token) => ApiConfig.authHeaders(token);
 
   Future<void> fetchWishlist(String token) async {
     _isLoading = true;

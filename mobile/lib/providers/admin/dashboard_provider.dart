@@ -25,10 +25,7 @@ class DashboardProvider with ChangeNotifier {
 
       final response = await http.get(
         Uri.parse(ApiConfig.adminDashboard),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.authHeaders(token),
       );
 
       if (response.statusCode == 200) {

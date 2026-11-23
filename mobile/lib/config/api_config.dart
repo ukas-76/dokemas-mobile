@@ -7,6 +7,19 @@ class ApiConfig {
   static String get storageBaseUrl =>
       '${baseUrl.replaceFirst(RegExp(r'/api/?$'), '')}/storage';
 
+  static Map<String, String> get defaultHeaders => {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+
+  static Map<String, String> authHeaders(String? token) => {
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+
   // Endpoint URL Helper
   static const String login = '$baseUrl/login';
   static const String register = '$baseUrl/register';

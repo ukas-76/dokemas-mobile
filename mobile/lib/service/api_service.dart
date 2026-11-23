@@ -9,7 +9,10 @@ import '../config/api_config.dart';
 class ApiService {
   Future<List<Destination>> fetchDestinations() async {
     try {
-      final response = await http.get(Uri.parse(ApiConfig.destinations));
+      final response = await http.get(
+        Uri.parse(ApiConfig.destinations),
+        headers: ApiConfig.defaultHeaders,
+      );
 
       if (response.statusCode == 200) {
         final decodedData = jsonDecode(response.body);
@@ -36,7 +39,10 @@ class ApiService {
 
   Future<List<Category>> fetchCategories() async {
     try {
-      final response = await http.get(Uri.parse(ApiConfig.categories));
+      final response = await http.get(
+        Uri.parse(ApiConfig.categories),
+        headers: ApiConfig.defaultHeaders,
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> body = jsonDecode(response.body);
@@ -51,7 +57,10 @@ class ApiService {
 
   Future<List<Facility>> fetchFacilities() async {
     try {
-      final response = await http.get(Uri.parse(ApiConfig.facilities));
+      final response = await http.get(
+        Uri.parse(ApiConfig.facilities),
+        headers: ApiConfig.defaultHeaders,
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> body = jsonDecode(response.body);
@@ -68,10 +77,7 @@ class ApiService {
     try {
       final response = await http.get(
         Uri.parse(ApiConfig.myReviews),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.authHeaders(token),
       );
 
       if (response.statusCode == 200) {
@@ -101,9 +107,7 @@ class ApiService {
     try {
       final response = await http.get(
         Uri.parse('${ApiConfig.destinations}/$destinationId/reviews'),
-        headers: {
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.defaultHeaders,
       );
 
       if (response.statusCode == 200) {
@@ -138,11 +142,7 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('${ApiConfig.destinations}/$destinationId/reviews'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
+        headers: ApiConfig.authHeaders(token),
         body: jsonEncode({
           'rating': rating,
           'comment': comment,

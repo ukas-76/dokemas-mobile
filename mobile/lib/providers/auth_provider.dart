@@ -40,10 +40,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.get(
         Uri.parse(ApiConfig.me),
-        headers: {
-          'Authorization': 'Bearer $_token',
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.authHeaders(_token),
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
@@ -65,10 +62,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse(ApiConfig.login),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.defaultHeaders,
         body: jsonEncode({
           'email': email,
           'password': password,
@@ -104,10 +98,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse(ApiConfig.register),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.defaultHeaders,
         body: jsonEncode({
           'name': name,
           'email': email,
@@ -145,11 +136,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.put(
         Uri.parse(ApiConfig.updateProfile),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $_token',
-        },
+        headers: ApiConfig.authHeaders(_token),
         body: jsonEncode({
           'name': name,
           'email': email,
@@ -185,8 +172,7 @@ class AuthProvider with ChangeNotifier {
         Uri.parse(ApiConfig.updateAvatar),
       );
       
-      request.headers['Authorization'] = 'Bearer $_token';
-      request.headers['Accept'] = 'application/json';
+      request.headers.addAll(ApiConfig.authHeaders(_token));
 
       request.fields['name'] = name;
       request.fields['email'] = email;
@@ -233,11 +219,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.put(
         Uri.parse(ApiConfig.updateProfile),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $_token',
-        },
+        headers: ApiConfig.authHeaders(_token),
         body: jsonEncode({
           'current_password': currentPassword,
           'password': password,
@@ -262,10 +244,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse(ApiConfig.forgotPassword),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.defaultHeaders,
         body: jsonEncode({'email': email}),
       );
 
@@ -286,10 +265,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse(ApiConfig.verifyOtp),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.defaultHeaders,
         body: jsonEncode({
           'email': email,
           'otp': otp,
@@ -317,10 +293,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse(ApiConfig.resetPassword),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: ApiConfig.defaultHeaders,
         body: jsonEncode({
           'email': email,
           'otp': otp,
@@ -351,10 +324,7 @@ class AuthProvider with ChangeNotifier {
       if (_token != null) {
         await http.post(
           Uri.parse(ApiConfig.logout),
-          headers: {
-            'Authorization': 'Bearer $_token',
-            'Accept': 'application/json',
-          },
+          headers: ApiConfig.authHeaders(_token),
         );
       }
     } catch (e) {

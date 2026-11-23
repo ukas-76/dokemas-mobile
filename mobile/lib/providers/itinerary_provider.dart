@@ -38,11 +38,7 @@ class ItineraryProvider with ChangeNotifier {
   }
 
   /// Header standar untuk request yang membutuhkan autentikasi.
-  Map<String, String> _authHeaders(String token) => {
-    'Authorization': 'Bearer $token',
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-  };
+  Map<String, String> _authHeaders(String token) => ApiConfig.authHeaders(token);
 
   // ─── LIST ─────────────────────────────────────────────────────────────
 
