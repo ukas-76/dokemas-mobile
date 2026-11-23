@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Route;
 | Public routes (guest)
 |--------------------------------------------------------------------------
 */
+Route::get('/', function () {
+    return response()->json([
+        'status' => 'online',
+        'app' => 'DOKEMAS API',
+        'message' => 'Backend API DOKEMAS Banyumas is running successfully.',
+        'version' => '1.0.0',
+    ]);
+});
+
 Route::get('register', function () {
     return response()->json(['message' => 'Method GET not allowed. Use POST to register.'], 405);
 });
