@@ -47,6 +47,7 @@ class MitraRegistrationController extends Controller
             // Step 2: Profil Destinasi
             'destination_name' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
+            'description' => ['nullable', 'string'],
             'price' => ['nullable', 'numeric', 'min:0'],
             'opening_hours' => ['nullable', 'string', 'max:100'],
             'is_24_hours' => ['nullable', 'boolean'],
@@ -55,7 +56,10 @@ class MitraRegistrationController extends Controller
             'address' => ['required', 'string'],
             'access_directions' => ['nullable', 'string'],
             'cs_phone' => ['required', 'string', 'max:25'],
-            'photos' => ['nullable', 'array', 'min:1'],
+            'facility_ids' => ['nullable', 'array'],
+            'facility_ids.*' => ['integer', 'exists:facilities,id'],
+            'thumbnail' => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'photos' => ['nullable', 'array'],
             'photos.*' => ['file', 'mimes:jpeg,png,jpg,webp', 'max:5120'], // Max 5MB per file
 
             // Step 3: Legalitas & Rekening
@@ -129,7 +133,7 @@ class MitraRegistrationController extends Controller
                 'category_id' => $validated['category_id'],
                 'name' => $validated['destination_name'],
                 'slug' => $slug,
-                'description' => $validated['destination_name'] . ' - Destinasi mitra resmi DOKEMAS Banyumas.',
+                'description' => $validated['description'] ?? ($validated['destination_name'] . ' - Destinasi mitra resmi DOKEMAS Banyumas.'),
                 'address' => $validated['address'],
                 'district' => $validated['district'],
                 'access_directions' => $validated['access_directions'] ?? null,
@@ -142,17 +146,28 @@ class MitraRegistrationController extends Controller
                 'status' => 'pending', // menunggu verifikasi kurator Dinporabudpar
             ]);
 
+            // Sinkronisasi Fasilitas Terpilih
+            if (! empty($validated['facility_ids'])) {
+                $destination->facilities()->sync($validated['facility_ids']);
+            }
+
+            // Simpan Cover Thumbnail jika diupload terpisah
+            if ($request->hasFile('thumbnail')) {
+                $thumbPath = $this->images->storeAsWebp($request->file('thumbnail'), 'destinations');
+                $destination->update(['thumbnail' => $thumbPath]);
+            }
+
             // 5. Simpan Galeri Foto Destinasi
             if ($request->hasFile('photos')) {
-                $first = true;
+                $first = empty($destination->thumbnail);
                 foreach ($request->file('photos') as $photo) {
                     $path = $this->images->storeAsWebp($photo, 'destinations');
                     DestinationImage::create([
                         'destination_id' => $destination->id,
-                        'image' => $path,
+                        'image_path' => $path, // Kolom database adalah image_path
                     ]);
 
-                    // Jadikan foto pertama sebagai thumbnail cover
+                    // Jika belum ada thumbnail, jadikan foto pertama sebagai thumbnail cover
                     if ($first) {
                         $destination->update(['thumbnail' => $path]);
                         $first = false;
@@ -169,7 +184,7 @@ class MitraRegistrationController extends Controller
                 'data' => [
                     'user' => $user,
                     'mitra_profile' => $mitraProfile,
-                    'destination' => $destination->load('images'),
+                    'destination' => $destination->load(['images', 'facilities', 'category']),
                     'token' => $token,
                 ],
             ], 201);
