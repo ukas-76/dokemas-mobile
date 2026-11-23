@@ -24,6 +24,16 @@ class MitraRegistrationController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
+        $existingUser = auth('sanctum')->user() ?? User::where('email', $request->input('email'))->first();
+        $ignoreUserId = $existingUser ? $existingUser->id : 'NULL';
+
+        // Jika user yang sudah terdaftar adalah mitra atau admin, dan sudah punya profil mitra
+        if ($existingUser && $existingUser->mitraProfile) {
+            return response()->json([
+                'message' => 'Akun dengan email ini sudah terdaftar sebagai mitra dan memiliki profil kemitraan.',
+            ], 422);
+        }
+
         $validated = $request->validate([
             // Step 1: Informasi Akun & Penanggung Jawab
             'name' => ['required', 'string', 'max:255'],
@@ -31,8 +41,8 @@ class MitraRegistrationController extends Controller
             'entity_type' => ['required', 'string', 'max:100'],
             'position' => ['required', 'string', 'max:100'],
             'phone' => ['required', 'string', 'max:25'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'email' => ['required', 'string', 'email', 'max:255', "unique:users,email,{$ignoreUserId}"],
+            'password' => [$existingUser ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
 
             // Step 2: Profil Destinasi
             'destination_name' => ['required', 'string', 'max:255'],
@@ -60,15 +70,28 @@ class MitraRegistrationController extends Controller
             'bank_account_holder' => ['required', 'string', 'max:150'],
         ]);
 
-        return DB::transaction(function () use ($request, $validated) {
-            // 1. Buat User Mitra
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'password' => Hash::make($validated['password']),
-                'role' => 'mitra',
-            ]);
+        return DB::transaction(function () use ($request, $validated, $existingUser) {
+            // 1. Buat User Mitra Baru atau Upgrade Akun User yang Sudah Ada
+            if ($existingUser) {
+                $user = $existingUser;
+                $userUpdate = [
+                    'name' => $validated['name'],
+                    'phone' => $validated['phone'],
+                    'role' => 'mitra',
+                ];
+                if (! empty($validated['password'])) {
+                    $userUpdate['password'] = Hash::make($validated['password']);
+                }
+                $user->update($userUpdate);
+            } else {
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'password' => Hash::make($validated['password']),
+                    'role' => 'mitra',
+                ]);
+            }
 
             // 2. Simpan Berkas Legalitas
             $nibPath = null;
