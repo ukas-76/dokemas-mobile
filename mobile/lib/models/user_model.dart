@@ -1,3 +1,5 @@
+import '../config/api_config.dart';
+
 class UserModel {
   final int id;
   final String name;
@@ -24,7 +26,7 @@ class UserModel {
     if (avatar!.startsWith('http')) {
       return avatar!.replaceFirst('http://', 'https://');
     }
-    return 'https://porto-backend-dokemas.rryxja.easypanel.host/storage/$avatar';
+    return '${ApiConfig.storageBaseUrl}/$avatar';
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {

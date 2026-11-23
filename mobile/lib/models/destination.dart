@@ -1,4 +1,5 @@
 import 'facility.dart';
+import '../config/api_config.dart';
 
 class DestinationImage {
   final int id;
@@ -10,7 +11,7 @@ class DestinationImage {
     String rawThumb = (json['image_url'] ?? '').toString();
     String parsedUrl = rawThumb;
     if (rawThumb.isNotEmpty && !rawThumb.startsWith('http')) {
-      parsedUrl = 'https://porto-backend-dokemas.rryxja.easypanel.host/storage/$rawThumb';
+      parsedUrl = '${ApiConfig.storageBaseUrl}/$rawThumb';
     } else {
       parsedUrl = rawThumb.replaceFirst('http://', 'https://');
     }
@@ -144,7 +145,7 @@ class Destination {
       thumbnailUrl: () {
         String rawThumb = (json['thumbnail_url'] ?? '').toString();
         if (rawThumb.isNotEmpty && !rawThumb.startsWith('http')) {
-          return 'https://porto-backend-dokemas.rryxja.easypanel.host/storage/$rawThumb';
+          return '${ApiConfig.storageBaseUrl}/$rawThumb';
         }
         return rawThumb.replaceFirst('http://', 'https://');
       }(),

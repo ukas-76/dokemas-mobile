@@ -1,4 +1,5 @@
 import '../theme/app_colors.dart';
+import '../config/api_config.dart';
 import 'package:intl/intl.dart';
 
 /// Status moderasi review.
@@ -60,7 +61,7 @@ class Review {
     if (avatar.startsWith('http')) {
       return avatar.replaceFirst('http://', 'https://');
     }
-    return 'https://porto-backend-dokemas.rryxja.easypanel.host/storage/$avatar';
+    return '${ApiConfig.storageBaseUrl}/$avatar';
   }
 
   factory Review.fromJson(Map<String, dynamic> json) {

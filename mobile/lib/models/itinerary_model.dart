@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/api_config.dart';
 
 /// Model untuk satu Itinerary (rencana perjalanan).
 class ItineraryModel {
@@ -123,7 +124,7 @@ class ItineraryItemModel {
       
       String rawThumb = (dest['thumbnail_url'] ?? dest['image_url'] ?? '').toString();
       if (rawThumb.isNotEmpty && !rawThumb.startsWith('http')) {
-        destThumbnail = 'https://porto-backend-dokemas.rryxja.easypanel.host/storage/$rawThumb';
+        destThumbnail = '${ApiConfig.storageBaseUrl}/$rawThumb';
       } else {
         destThumbnail = rawThumb.replaceFirst('http://', 'https://');
       }
