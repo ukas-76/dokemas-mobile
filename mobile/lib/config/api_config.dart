@@ -2,7 +2,7 @@ class ApiConfig {
   // Ganti URL ini sesuai dengan URL backend yang sedang aktif
   // Pastikan diakhiri tanpa slash (/) jika endpoint sudah menggunakan /
   static const String baseUrl =
-      'https://dokemas-mobile-314ec.containers.snapdeploy.app/api';
+      'https://nomadically-premethodical-bobbye.ngrok-free.dev/api';
 
   static String get storageBaseUrl =>
       '${baseUrl.replaceFirst(RegExp(r'/api/?$'), '')}/storage';
