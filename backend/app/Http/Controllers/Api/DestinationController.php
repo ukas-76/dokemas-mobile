@@ -15,10 +15,24 @@ class DestinationController extends Controller
 
     public function index(Request $request)
     {
+        $user = auth('sanctum')->user();
+        $isAdmin = $user && in_array($user->role, ['admin', 'super_admin', 'superadmin']);
+
         $query = Destination::query()
-            ->where('status', 'published')
-            ->with(['category', 'images'])
+            ->with(['category', 'images', 'facilities', 'user:id,name,email,phone,role'])
             ->withCount('reviews');
+
+        $status = $request->query('status');
+        if ($isAdmin && $status) {
+            if ($status !== 'all') {
+                $query->where('status', $status);
+            }
+        } elseif ($isAdmin && $request->has('status')) {
+            // Admin meminta seluruh destinasi tanpa filter status
+        } else {
+            // Publik/tamu default hanya melihat destinasi published
+            $query->where('status', 'published');
+        }
 
         if ($search = $request->query('search')) {
             $query->where(function ($q) use ($search) {

@@ -79,6 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('mitra/destinations', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'index']);
     Route::post('mitra/destinations', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'store']);
     Route::get('mitra/destinations/{destination}', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'show']);
+    Route::match(['put', 'patch'], 'mitra/destinations/{destination}', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'update']);
 
     // Itineraries
     Route::apiResource('itineraries', ItineraryController::class);

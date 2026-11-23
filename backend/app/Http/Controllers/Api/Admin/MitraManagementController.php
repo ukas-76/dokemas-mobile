@@ -43,8 +43,8 @@ class MitraManagementController extends Controller
     }
 
     /**
-     * Setujui pendaftaran mitra (Verifikasi Sukses).
-     * Otomatis mempublikasikan destinasi ke aplikasi mobile.
+     * Setujui pendaftaran akun mitra (Verifikasi Sukses NIB & Legalitas).
+     * Destinasi tempat wisata TETAP berstatus 'pending' menunggu kurasi terpisah.
      */
     public function approve(int $id): JsonResponse
     {
@@ -55,14 +55,9 @@ class MitraManagementController extends Controller
             'rejection_reason' => null,
         ]);
 
-        // Publish destinasi milik mitra ini agar tampil di mobile Dokemas
-        Destination::where('user_id', $profile->user_id)
-            ->where('status', 'pending')
-            ->update(['status' => 'published']);
-
         return response()->json([
             'success' => true,
-            'message' => 'Kemitraan berhasil disetujui. Destinasi telah resmi dipublikasikan ke aplikasi DOKEMAS.',
+            'message' => 'Akun kemitraan berhasil diverifikasi. Status destinasi tetap pending dan menunggu kurasi konten tempat wisata oleh Super Admin.',
             'data' => $profile->load(['user', 'user.destinations']),
         ]);
     }

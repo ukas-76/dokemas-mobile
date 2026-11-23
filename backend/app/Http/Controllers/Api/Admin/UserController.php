@@ -10,7 +10,9 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->withCount(['reviews', 'wishlists', 'itineraries']);
+        $query = User::query()
+            ->with(['destinations', 'mitraProfile'])
+            ->withCount(['reviews', 'wishlists', 'itineraries']);
 
         if ($search = $request->query('search')) {
             $query->where(function ($q) use ($search) {
@@ -47,7 +49,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        return $user->loadCount(['reviews', 'wishlists', 'itineraries']);
+        return $user->load(['destinations', 'mitraProfile'])->loadCount(['reviews', 'wishlists', 'itineraries']);
     }
 
     public function update(Request $request, User $user)
