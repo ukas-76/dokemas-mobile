@@ -14,7 +14,7 @@ COPY . .
 
 RUN composer install --no-interaction --no-scripts --no-dev --optimize-autoloader \
     && if [ -f package.json ]; then npm install && npm run build; fi \
-    && rm -f .env \
+    && cp .env.example .env \
     && chmod +x docker/start.sh \
     && chown -R nginx:nginx public \
     && chown -R nobody:nobody storage bootstrap/cache \

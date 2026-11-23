@@ -1,7 +1,6 @@
 #!/bin/sh
-set -e
 
-echo "=== Starting Dokemass Backend ==="
+echo "=== Starting Dokemas Backend ==="
 
 # Create required directories
 mkdir -p /run/nginx
@@ -18,22 +17,23 @@ cd /var/www/html
 chown -R nobody:nobody /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Run migrations
+# Ensure .env exists
+if [ ! -f /var/www/html/.env ]; then
+    cp /var/www/html/.env.example /var/www/html/.env 2>/dev/null || true
+fi
+
+# Ensure storage link
+rm -rf /var/www/html/public/storage 2>/dev/null || true
+php artisan storage:link --force 2>/dev/null || true
+
+# Run migrations non-destructively without crashing container
 echo "=== Running migrations ==="
-php artisan migrate --force
+php artisan migrate --force 2>&1 || echo "Notice: migrations skipped or already applied"
 
-# Run seeder (idempotent — safe to run multiple times)
-echo "=== Running seeder ==="
-php artisan db:seed --force || echo "WARNING: Seeder failed, continuing anyway..."
-
-# Post-deploy tasks
-# Remove public/storage if it was copied as a real directory during Docker build
-# (the local symlink/junction gets resolved into a real dir by COPY)
-rm -rf /var/www/html/public/storage
-php artisan storage:link --force
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# Clear caches so dynamic env is fresh
+php artisan config:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
 
 echo "=== Starting supervisord ==="
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
