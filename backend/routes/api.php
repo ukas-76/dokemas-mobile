@@ -74,8 +74,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/toggle', [WishlistController::class, 'toggle']);
     Route::delete('wishlist/{destination}', [WishlistController::class, 'destroy']);
 
-    // Portal Mitra
+    // Portal Mitra (Pendaftaran & Manajemen Destinasi)
     Route::get('mitra/status', [\App\Http\Controllers\Api\MitraRegistrationController::class, 'status']);
+    Route::get('mitra/destinations', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'index']);
+    Route::post('mitra/destinations', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'store']);
+    Route::get('mitra/destinations/{destination}', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'show']);
 
     // Itineraries
     Route::apiResource('itineraries', ItineraryController::class);
@@ -96,6 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
         Route::apiResource('facilities', FacilityController::class)->except(['index']);
         Route::apiResource('destinations', DestinationController::class)->except(['index', 'show']);
+        Route::patch('destinations/{destination}/status', [DestinationController::class, 'updateStatus']);
         Route::apiResource('users', AdminUserController::class);
         Route::get('reviews', [\App\Http\Controllers\Api\Admin\ReviewController::class, 'index']);
         Route::patch('reviews/{review}/status', [\App\Http\Controllers\Api\Admin\ReviewController::class, 'updateStatus']);

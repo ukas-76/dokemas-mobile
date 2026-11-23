@@ -37,6 +37,10 @@ class ApiConfig {
   static const String adminFacilities = '$baseUrl/admin/facilities';
   static const String destinations = '$baseUrl/destinations';
   static const String adminDestinations = '$baseUrl/admin/destinations';
+  static String adminDestinationStatus(int id) => '$baseUrl/admin/destinations/$id/status';
+  static const String adminMitraApplications = '$baseUrl/admin/mitra-applications';
+  static const String mitraStatus = '$baseUrl/mitra/status';
+  static const String mitraDestinations = '$baseUrl/mitra/destinations';
   static const String adminReviews = '$baseUrl/admin/reviews';
   static const String myReviews = '$baseUrl/me/reviews';
   static const String adminDashboard = '$baseUrl/admin/dashboard';

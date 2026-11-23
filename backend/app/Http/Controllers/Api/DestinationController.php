@@ -15,7 +15,10 @@ class DestinationController extends Controller
 
     public function index(Request $request)
     {
-        $query = Destination::query()->with(['category', 'images'])->withCount('reviews');
+        $query = Destination::query()
+            ->where('status', 'published')
+            ->with(['category', 'images'])
+            ->withCount('reviews');
 
         if ($search = $request->query('search')) {
             $query->where(function ($q) use ($search) {
@@ -75,11 +78,37 @@ class DestinationController extends Controller
 
     public function show(Destination $destination)
     {
+        if ($destination->status !== 'published') {
+            $user = auth('sanctum')->user();
+            if (! $user || ($user->role !== 'admin' && $user->id !== $destination->user_id)) {
+                return response()->json([
+                    'message' => 'Destinasi ini belum dipublikasikan atau masih dalam tahap kurasi.',
+                ], 404);
+            }
+        }
+
         return $destination->load([
             'category',
             'facilities',
             'images',
             'reviews.user:id,name,avatar',
+        ]);
+    }
+
+    /**
+     * Kurasi status destinasi oleh admin (published, pending, draft, archived).
+     */
+    public function updateStatus(Request $request, Destination $destination)
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:draft,pending,published,archived'],
+        ]);
+
+        $destination->update(['status' => $validated['status']]);
+
+        return response()->json([
+            'message' => "Status destinasi '{$destination->name}' berhasil diubah menjadi {$destination->status}.",
+            'data' => $destination->fresh()->load(['category', 'facilities', 'images']),
         ]);
     }
 
@@ -172,11 +201,17 @@ class DestinationController extends Controller
             'name' => [$required, 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
+            'district' => ['nullable', 'string', 'max:255'],
+            'access_directions' => ['nullable', 'string'],
+            'maps_url' => ['nullable', 'string', 'max:255'],
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'price' => ['nullable', 'numeric', 'min:0'],
             'opening_hours' => ['nullable', 'string', 'max:255'],
+            'is_24_hours' => ['nullable', 'boolean'],
             'phone' => ['nullable', 'string', 'max:30'],
+            'cs_phone' => ['nullable', 'string', 'max:30'],
+            'status' => ['nullable', 'string', 'in:draft,pending,published,archived'],
             'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'is_popular' => ['nullable', 'boolean'],
             'facility_ids' => ['nullable', 'array'],
