@@ -77,6 +77,8 @@ class DestinationController extends Controller
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $this->images->storeAsWebp($request->file('thumbnail'), 'destinations');
+        } elseif ($request->filled('thumbnail') && is_string($request->input('thumbnail'))) {
+            $data['thumbnail'] = $request->input('thumbnail');
         }
 
         $facilities = $request->input('facility_ids', []);
@@ -137,6 +139,8 @@ class DestinationController extends Controller
         if ($request->hasFile('thumbnail')) {
             $this->images->delete($destination->thumbnail);
             $data['thumbnail'] = $this->images->storeAsWebp($request->file('thumbnail'), 'destinations');
+        } elseif ($request->filled('thumbnail') && is_string($request->input('thumbnail'))) {
+            $data['thumbnail'] = $request->input('thumbnail');
         }
 
         $destination->update($data);
@@ -226,7 +230,7 @@ class DestinationController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'cs_phone' => ['nullable', 'string', 'max:30'],
             'status' => ['nullable', 'string', 'in:draft,pending,published,archived'],
-            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'thumbnail' => ['nullable'],
             'is_popular' => ['nullable', 'boolean'],
             'facility_ids' => ['nullable', 'array'],
             'facility_ids.*' => ['integer', 'exists:facilities,id'],

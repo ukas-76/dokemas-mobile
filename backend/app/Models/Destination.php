@@ -18,11 +18,40 @@ class Destination extends Model
         'is_24_hours', 'thumbnail', 'rating_avg', 'rating_count', 'is_popular', 'status',
     ];
 
-    protected $appends = ['thumbnail_url'];
+    protected $appends = [
+        'thumbnail_url',
+        'image',
+        'image_url',
+        'cover_image',
+    ];
 
     protected function thumbnailUrl(): Attribute
     {
-        return Attribute::get(fn (mixed $value, array $attributes) => !empty($attributes['thumbnail']) ? Storage::disk('public')->url($attributes['thumbnail']) : null);
+        return Attribute::get(function (mixed $value, array $attributes) {
+            if (empty($attributes['thumbnail'])) {
+                return null;
+            }
+            $thumb = $attributes['thumbnail'];
+            if (str_starts_with($thumb, 'http://') || str_starts_with($thumb, 'https://')) {
+                return $thumb;
+            }
+            return Storage::disk('public')->url($thumb);
+        });
+    }
+
+    protected function image(): Attribute
+    {
+        return Attribute::get(fn () => $this->thumbnail_url);
+    }
+
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::get(fn () => $this->thumbnail_url);
+    }
+
+    protected function coverImage(): Attribute
+    {
+        return Attribute::get(fn () => $this->thumbnail_url);
     }
 
     protected function casts(): array

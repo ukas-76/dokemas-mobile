@@ -37,7 +37,10 @@ class MitraManagementController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $profile = MitraProfile::with(['user', 'user.destinations.images', 'user.destinations.category'])->findOrFail($id);
+        $profile = MitraProfile::with(['user', 'user.destinations.images', 'user.destinations.category'])
+            ->where('id', $id)
+            ->orWhere('user_id', $id)
+            ->firstOrFail();
 
         return response()->json($profile);
     }
@@ -48,12 +51,27 @@ class MitraManagementController extends Controller
      */
     public function approve(int $id): JsonResponse
     {
-        $profile = MitraProfile::findOrFail($id);
-        $profile->update([
-            'verification_status' => 'verified',
-            'verified_at' => now(),
-            'rejection_reason' => null,
-        ]);
+        $profile = MitraProfile::where('id', $id)->orWhere('user_id', $id)->first();
+        if (! $profile) {
+            $user = \App\Models\User::findOrFail($id);
+            $profile = MitraProfile::create([
+                'user_id' => $user->id,
+                'entity_type' => 'Perorangan',
+                'nib' => 'NIB-' . date('YmdHis'),
+                'verification_status' => 'verified',
+                'verified_at' => now(),
+            ]);
+            $user->update(['role' => 'mitra']);
+        } else {
+            $profile->update([
+                'verification_status' => 'verified',
+                'verified_at' => now(),
+                'rejection_reason' => null,
+            ]);
+            if ($profile->user) {
+                $profile->user->update(['role' => 'mitra']);
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -68,14 +86,27 @@ class MitraManagementController extends Controller
     public function reject(Request $request, int $id): JsonResponse
     {
         $request->validate([
-            'reason' => ['required', 'string', 'max:1000'],
+            'reason' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $profile = MitraProfile::findOrFail($id);
-        $profile->update([
-            'verification_status' => 'rejected',
-            'rejection_reason' => $request->input('reason'),
-        ]);
+        $profile = MitraProfile::where('id', $id)->orWhere('user_id', $id)->first();
+        $reason = $request->input('reason', 'Dokumen atau data kemitraan belum memenuhi persyaratan verifikasi.');
+
+        if (! $profile) {
+            $user = \App\Models\User::findOrFail($id);
+            $profile = MitraProfile::create([
+                'user_id' => $user->id,
+                'entity_type' => 'Perorangan',
+                'nib' => 'NIB-' . date('YmdHis'),
+                'verification_status' => 'rejected',
+                'rejection_reason' => $reason,
+            ]);
+        } else {
+            $profile->update([
+                'verification_status' => 'rejected',
+                'rejection_reason' => $reason,
+            ]);
+        }
 
         return response()->json([
             'success' => true,

@@ -11,11 +11,30 @@ class DestinationImage extends Model
 {
     protected $fillable = ['destination_id', 'image_path', 'caption'];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'image', 'url'];
 
     protected function imageUrl(): Attribute
     {
-        return Attribute::get(fn (mixed $value, array $attributes) => !empty($attributes['image_path']) ? Storage::disk('public')->url($attributes['image_path']) : null);
+        return Attribute::get(function (mixed $value, array $attributes) {
+            if (empty($attributes['image_path'])) {
+                return null;
+            }
+            $path = $attributes['image_path'];
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+            return Storage::disk('public')->url($path);
+        });
+    }
+
+    protected function image(): Attribute
+    {
+        return Attribute::get(fn () => $this->image_url);
+    }
+
+    protected function url(): Attribute
+    {
+        return Attribute::get(fn () => $this->image_url);
     }
 
     public function destination(): BelongsTo
