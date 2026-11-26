@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../widgets/dokemas_logo.dart';
 import 'main_screen.dart';
 import 'admin/admin_shell.dart' as admin_shell;
+import 'mitra/mitra_shell.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -33,11 +34,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    // Cek apakah admin atau user biasa
+    // Cek apakah admin, mitra, atau user biasa
     if (authProvider.isLoggedIn && authProvider.user?.role == 'admin') {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const admin_shell.AdminShell()),
+      );
+    } else if (authProvider.isLoggedIn && authProvider.user?.role == 'mitra') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MitraShell()),
       );
     } else {
       Navigator.pushReplacement(
