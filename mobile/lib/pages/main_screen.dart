@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/wishlist_provider.dart';
+import 'admin/admin_shell.dart';
+import 'mitra/mitra_shell.dart';
 import 'beranda.dart';
 import 'explore_page.dart';
 import 'guest/guest_itinerary_page.dart';
@@ -40,7 +42,18 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
+    final authProvider = context.watch<AuthProvider>();
+    final bool isLoggedIn = authProvider.isLoggedIn;
+    final String? role = authProvider.user?.role;
+
+    // Jika sedang login sebagai Mitra atau Admin, langsung tampilkan Shell masing-masing
+    if (isLoggedIn) {
+      if (role == 'mitra') {
+        return const MitraShell();
+      } else if (role == 'admin') {
+        return const AdminShell();
+      }
+    }
 
     final List<Widget> pages = isLoggedIn
         ? [
