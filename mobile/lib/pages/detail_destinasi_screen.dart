@@ -2014,6 +2014,52 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
               height: 1.4,
             ),
           ),
+          if (review.reply != null && review.reply!.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFBBF7D0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.storefront_rounded, size: 15, color: Color(0xFF16A34A)),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'Respon Pengelola',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: Color(0xFF16A34A),
+                        ),
+                      ),
+                      if (review.repliedDate != null) ...[
+                        const Spacer(),
+                        Text(
+                          review.repliedDate!,
+                          style: const TextStyle(fontSize: 10.5, color: Colors.grey),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    review.reply!,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Colors.grey[800],
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -2324,6 +2370,8 @@ class _DaftarUlasanScreenState extends State<DaftarUlasanScreen> {
                           rating: item.rating.toInt(),
                           isi: item.comment,
                           avatarUrl: item.userAvatar,
+                          reply: item.reply,
+                          repliedAt: item.repliedDate,
                         );
                       },
                     ),
@@ -2362,6 +2410,8 @@ class ItemReviewCard extends StatelessWidget {
   final int rating;
   final String isi;
   final String? avatarUrl;
+  final String? reply;
+  final String? repliedAt;
 
   const ItemReviewCard({
     super.key,
@@ -2370,6 +2420,8 @@ class ItemReviewCard extends StatelessWidget {
     required this.rating,
     required this.isi,
     this.avatarUrl,
+    this.reply,
+    this.repliedAt,
   });
 
   @override
@@ -2436,6 +2488,52 @@ class ItemReviewCard extends StatelessWidget {
               height: 1.4,
             ),
           ),
+          if (reply != null && reply!.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFBBF7D0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.storefront_rounded, size: 15, color: Color(0xFF16A34A)),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'Respon Pengelola',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: Color(0xFF16A34A),
+                        ),
+                      ),
+                      if (repliedAt != null) ...[
+                        const Spacer(),
+                        Text(
+                          repliedAt!,
+                          style: const TextStyle(fontSize: 10.5, color: Colors.grey),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    reply!,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Colors.grey[800],
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

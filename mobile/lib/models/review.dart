@@ -28,6 +28,8 @@ class Review {
   final String destinationName;
   final double rating;
   final String comment;
+  final String? reply;
+  final DateTime? repliedAt;
   final DateTime createdAt;
   final ReviewStatus status;
   final int flagCount;
@@ -42,6 +44,8 @@ class Review {
     required this.destinationName,
     required this.rating,
     required this.comment,
+    this.reply,
+    this.repliedAt,
     required this.createdAt,
     this.status = ReviewStatus.public,
     this.flagCount = 0,
@@ -52,6 +56,11 @@ class Review {
 
   String get date {
     return DateFormat('MMM dd, yyyy').format(createdAt);
+  }
+
+  String? get repliedDate {
+    if (repliedAt == null) return null;
+    return DateFormat('dd MMM yyyy, HH:mm').format(repliedAt!);
   }
 
   static String? _parseAvatar(dynamic avatarStr) {
@@ -74,6 +83,8 @@ class Review {
       destinationName: json['destination']?['name'] ?? 'Unknown Destination',
       rating: (json['rating'] ?? 0).toDouble(),
       comment: json['comment'] ?? '',
+      reply: json['reply'],
+      repliedAt: json['replied_at'] != null ? DateTime.tryParse(json['replied_at']) : null,
       createdAt: json['created_at'] != null 
           ? DateTime.parse(json['created_at']) 
           : DateTime.now(),

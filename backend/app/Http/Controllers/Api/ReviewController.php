@@ -71,6 +71,36 @@ class ReviewController extends Controller
         return response()->json($review->load('user:id,name,avatar'));
     }
 
+    /**
+     * Balas ulasan oleh mitra pengelola destinasi atau admin.
+     */
+    public function reply(Request $request, Review $review)
+    {
+        $user = $request->user();
+
+        // Validasi: hanya mitra pemilik destinasi atau admin yang boleh membalas
+        if (! $user->isAdmin() && $review->destination->user_id !== $user->id) {
+            return response()->json([
+                'message' => 'Anda tidak memiliki hak akses untuk membalas ulasan di destinasi ini.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'reply' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $review->update([
+            'reply' => $validated['reply'],
+            'replied_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tanggapan ulasan berhasil disimpan.',
+            'data' => $review->load('user:id,name,avatar'),
+        ]);
+    }
+
     public function destroy(Request $request, Review $review)
     {
         // owner or admin may delete (admin = moderation)

@@ -140,6 +140,8 @@ class MitraReview {
   final String? reviewerAvatar;
   final double rating;
   final String? comment;
+  final String? reply;
+  final String? repliedAt;
   final String createdAt;
   final String status;
 
@@ -149,6 +151,8 @@ class MitraReview {
     this.reviewerAvatar,
     required this.rating,
     this.comment,
+    this.reply,
+    this.repliedAt,
     required this.createdAt,
     required this.status,
   });
@@ -161,6 +165,8 @@ class MitraReview {
       reviewerAvatar: user?['avatar'],
       rating: (json['rating'] ?? 0).toDouble(),
       comment: json['comment'],
+      reply: json['reply'],
+      repliedAt: json['replied_at'],
       createdAt: json['created_at'] ?? '',
       status: json['status'] ?? 'public',
     );
@@ -266,6 +272,29 @@ class MitraProvider with ChangeNotifier {
       } else {
         final body = jsonDecode(resp.body);
         return body['message'] ?? 'Gagal menyimpan perubahan';
+      }
+    } catch (e) {
+      return 'Koneksi gagal: $e';
+    }
+  }
+
+  /// Balas ulasan wisatawan (POST /api/mitra/reviews/{id}/reply)
+  Future<String?> replyReview(int reviewId, String replyText) async {
+    try {
+      final token = await _getToken();
+      final url = '${ApiConfig.baseUrl}/mitra/reviews/$reviewId/reply';
+      final resp = await http.post(
+        Uri.parse(url),
+        headers: ApiConfig.authHeaders(token),
+        body: jsonEncode({'reply': replyText}),
+      ).timeout(const Duration(seconds: 25));
+
+      if (resp.statusCode == 200) {
+        await fetchReviews(); // refresh ulasan
+        return null; // sukses
+      } else {
+        final body = jsonDecode(resp.body);
+        return body['message'] ?? 'Gagal menyimpan tanggapan ulasan';
       }
     } catch (e) {
       return 'Koneksi gagal: $e';

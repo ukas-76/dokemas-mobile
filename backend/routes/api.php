@@ -67,6 +67,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('destinations/{destination}/reviews', [ReviewController::class, 'store']);
     Route::put('reviews/{review}', [ReviewController::class, 'update']);
     Route::delete('reviews/{review}', [ReviewController::class, 'destroy']);
+    Route::post('reviews/{review}/reply', [ReviewController::class, 'reply']);
+    Route::post('mitra/reviews/{review}/reply', [ReviewController::class, 'reply']);
 
     // Wishlist
     Route::get('wishlist', [WishlistController::class, 'index']);

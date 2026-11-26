@@ -180,9 +180,160 @@ class _ReviewCard extends StatelessWidget {
   final MitraReview review;
   const _ReviewCard({required this.review});
 
+  void _openReplySheet(BuildContext context, MitraReview review) {
+    final textController = TextEditingController(text: review.reply ?? '');
+    bool isSubmitting = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.reply_rounded, color: AppColors.primary, size: 18),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              review.reply != null ? 'Ubah Tanggapan' : 'Balas Ulasan Wisatawan',
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded),
+                          onPressed: () => Navigator.pop(bottomSheetContext),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Cuplikan ulasan wisatawan
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(review.reviewerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              const SizedBox(width: 8),
+                              _StarRow(rating: review.rating),
+                            ],
+                          ),
+                          if (review.comment != null && review.comment!.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text('"${review.comment}"', style: const TextStyle(fontSize: 12.5, fontStyle: FontStyle.italic, color: Color(0xFF475569))),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text('Tanggapan Pengelola:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: textController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'Tuliskan tanggapan ramah dan profesional untuk wisatawan...',
+                        hintStyle: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.all(12),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 46,
+                      child: FilledButton.icon(
+                        onPressed: isSubmitting
+                            ? null
+                            : () async {
+                                final text = textController.text.trim();
+                                if (text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Tanggapan tidak boleh kosong')),
+                                  );
+                                  return;
+                                }
+
+                                setModalState(() => isSubmitting = true);
+                                final prov = bottomSheetContext.read<MitraProvider>();
+                                final err = await prov.replyReview(review.id, text);
+
+                                if (!bottomSheetContext.mounted) return;
+                                Navigator.pop(bottomSheetContext);
+
+                                if (err == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('✅ Tanggapan ulasan berhasil disimpan!'),
+                                      backgroundColor: AppColors.success,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('❌ $err'), backgroundColor: AppColors.danger),
+                                  );
+                                }
+                              },
+                        icon: isSubmitting
+                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                            : const Icon(Icons.send_rounded, size: 18),
+                        label: Text(isSubmitting ? 'Mengirim...' : 'Kirim Tanggapan'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateStr = _formatDate(review.createdAt);
+    final hasReply = review.reply != null && review.reply!.isNotEmpty;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -229,6 +380,80 @@ class _ReviewCard extends StatelessWidget {
           if (review.comment != null && review.comment!.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(review.comment!, style: AppTextStyles.body),
+          ],
+
+          // Kotak Balasan Mitra jika sudah ada
+          if (hasReply) ...[
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFBBF7D0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.storefront_rounded, size: 16, color: AppColors.primary),
+                          SizedBox(width: 6),
+                          Text(
+                            'Tanggapan Anda (Pengelola)',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.primary),
+                          ),
+                        ],
+                      ),
+                      InkWell(
+                        onTap: () => _openReplySheet(context, review),
+                        borderRadius: BorderRadius.circular(4),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit_rounded, size: 13, color: AppColors.primary),
+                              SizedBox(width: 3),
+                              Text('Ubah', style: TextStyle(fontSize: 11.5, color: AppColors.primary, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    review.reply!,
+                    style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B), height: 1.4),
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            // Tombol Balas jika belum ada balasan
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () => _openReplySheet(context, review),
+                  icon: const Icon(Icons.reply_rounded, size: 16),
+                  label: const Text('Balas Ulasan'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ],
       ),
