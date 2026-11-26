@@ -9,11 +9,18 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function index(Destination $destination)
+    public function index(Request $request, Destination $destination)
     {
+        $userId = auth('sanctum')->id();
+
         return $destination->reviews()
             ->with('user:id,name,avatar')
-            ->where('status', 'public')
+            ->where(function ($query) use ($userId) {
+                $query->where('status', 'public');
+                if ($userId) {
+                    $query->orWhere('user_id', $userId);
+                }
+            })
             ->latest()
             ->get();
     }
@@ -38,11 +45,11 @@ class ReviewController extends Controller
             [
                 'rating' => $data['rating'], 
                 'comment' => $data['comment'] ?? null,
-                'status' => 'pending' // Force status to pending for admin review
+                'status' => 'public', // Otomatis publik agar langsung tayang untuk wisatawan
             ],
         );
 
-        $destination->recalcRating(); // This might include pending, should we only count public? Let's assume recalcRating handles it or counts all for now.
+        $destination->recalcRating();
 
         return response()->json($review->load('user:id,name,avatar'), 201);
     }
@@ -56,7 +63,7 @@ class ReviewController extends Controller
             'comment' => ['nullable', 'string'],
         ]);
         
-        $data['status'] = 'pending'; // Reset status to pending when updated
+        $data['status'] = 'public';
 
         $review->update($data);
         $review->destination->recalcRating();
