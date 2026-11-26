@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../widgets/dokemas_logo.dart';
 import '../main_screen.dart';
 import '../admin/admin_shell.dart';
+import '../mitra/mitra_shell.dart';
 import 'register_page.dart';
 import 'forgot_password_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,6 +66,18 @@ class _LoginPageState extends State<LoginPage> {
           );
           navigator.pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const AdminShell()),
+            (route) => false,
+          );
+        } else if (authProvider.user?.role == 'mitra') {
+          scaffoldMessenger.showSnackBar(
+            const SnackBar(
+              content: Text('Login sukses sebagai Mitra!'),
+              backgroundColor: Color(0xFF16A34A),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          navigator.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const MitraShell()),
             (route) => false,
           );
         } else {
