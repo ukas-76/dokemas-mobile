@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../providers/mitra_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/chat_provider.dart';
 import 'dashboard/mitra_dashboard_page.dart';
 import 'destinasi/mitra_destinasi_page.dart';
 import 'ulasan/mitra_ulasan_page.dart';
@@ -100,6 +102,11 @@ class _MitraShellState extends State<MitraShell> {
           setState(() => _index = i);
           if (i == 0) {
             context.read<MitraProvider>().fetchStatus();
+          } else if (i == 2) {
+            final token = context.read<AuthProvider>().token;
+            if (token != null) {
+              context.read<ChatProvider>().fetchConversations(token);
+            }
           } else if (i == 3) {
             context.read<MitraProvider>().fetchReviews();
           }
