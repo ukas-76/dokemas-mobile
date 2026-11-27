@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 
@@ -255,7 +256,7 @@ class MitraProvider with ChangeNotifier {
   /// Update destinasi mitra (PUT /api/mitra/destinations/{id})
   Future<String?> updateDestination({
     required int destinationId,
-    required Map<String, String> fields,
+    required Map<String, dynamic> fields,
   }) async {
     try {
       final token = await _getToken();
@@ -272,6 +273,72 @@ class MitraProvider with ChangeNotifier {
       } else {
         final body = jsonDecode(resp.body);
         return body['message'] ?? 'Gagal menyimpan perubahan';
+      }
+    } catch (e) {
+      return 'Koneksi gagal: $e';
+    }
+  }
+
+  /// Upload foto galeri destinasi mitra
+  Future<String?> uploadGalleryImages({
+    required int destinationId,
+    required List<XFile> images,
+  }) async {
+    try {
+      final token = await _getToken();
+      final uri = Uri.parse('${ApiConfig.mitraDestinations}/$destinationId/images');
+      final request = http.MultipartRequest('POST', uri);
+
+      request.headers.addAll({
+        if (token != null) 'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      });
+
+      for (final img in images) {
+        final bytes = await img.readAsBytes();
+        final part = http.MultipartFile.fromBytes(
+          'images[]',
+          bytes,
+          filename: img.name,
+        );
+        request.files.add(part);
+      }
+
+      final streamed = await request.send().timeout(const Duration(seconds: 45));
+      final resp = await http.Response.fromStream(streamed);
+
+      if (resp.statusCode == 200 || resp.statusCode == 201) {
+        await fetchStatus();
+        return null;
+      } else {
+        final body = jsonDecode(resp.body);
+        return body['message'] ?? 'Gagal mengunggah foto galeri';
+      }
+    } catch (e) {
+      return 'Koneksi gagal: $e';
+    }
+  }
+
+  /// Hapus foto galeri destinasi mitra
+  Future<String?> deleteGalleryImage({
+    required int destinationId,
+    required int imageId,
+  }) async {
+    try {
+      final token = await _getToken();
+      final url = '${ApiConfig.mitraDestinations}/$destinationId/images/$imageId';
+      final resp = await http.delete(
+        Uri.parse(url),
+        headers: ApiConfig.authHeaders(token),
+      ).timeout(const Duration(seconds: 20));
+
+      if (resp.statusCode == 200) {
+        await fetchStatus();
+        return null;
+      } else {
+        final body = jsonDecode(resp.body);
+        return body['message'] ?? 'Gagal menghapus foto';
       }
     } catch (e) {
       return 'Koneksi gagal: $e';

@@ -654,9 +654,26 @@ class _MitraDestinasiPageState extends State<MitraDestinasiPage> {
     return _buildSectionCard(
       title: 'Fasilitas Tersedia',
       icon: Icons.local_activity_rounded,
-      trailing: Text(
-        '${dest.facilities.length} Fasilitas',
-        style: const TextStyle(fontSize: 11.5, color: AppColors.primary, fontWeight: FontWeight.bold),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '${dest.facilities.length} Fasilitas',
+            style: const TextStyle(fontSize: 11.5, color: AppColors.primary, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MitraEditDestinasiPage(destination: dest, initialSection: 'fasilitas'),
+                ),
+              );
+            },
+            child: const Icon(Icons.edit_outlined, size: 16, color: AppColors.primary),
+          ),
+        ],
       ),
       child: dest.facilities.isEmpty
           ? Center(
@@ -673,7 +690,7 @@ class _MitraDestinasiPageState extends State<MitraDestinasiPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => MitraEditDestinasiPage(destination: dest),
+                            builder: (_) => MitraEditDestinasiPage(destination: dest, initialSection: 'fasilitas'),
                           ),
                         );
                       },
@@ -733,9 +750,26 @@ class _MitraDestinasiPageState extends State<MitraDestinasiPage> {
     return _buildSectionCard(
       title: 'Galeri Foto Wisata',
       icon: Icons.photo_library_rounded,
-      trailing: Text(
-        '${dest.images.length} Foto',
-        style: const TextStyle(fontSize: 11.5, color: AppColors.primary, fontWeight: FontWeight.bold),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '${dest.images.length} Foto',
+            style: const TextStyle(fontSize: 11.5, color: AppColors.primary, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MitraEditDestinasiPage(destination: dest, initialSection: 'galeri'),
+                ),
+              );
+            },
+            child: const Icon(Icons.add_photo_alternate_outlined, size: 16, color: AppColors.primary),
+          ),
+        ],
       ),
       child: dest.images.isEmpty
           ? Container(
@@ -757,7 +791,7 @@ class _MitraDestinasiPageState extends State<MitraDestinasiPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => MitraEditDestinasiPage(destination: dest),
+                          builder: (_) => MitraEditDestinasiPage(destination: dest, initialSection: 'galeri'),
                         ),
                       );
                     },

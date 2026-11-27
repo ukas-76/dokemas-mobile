@@ -90,6 +90,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('mitra/destinations', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'store']);
     Route::get('mitra/destinations/{destination}', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'show']);
     Route::match(['put', 'patch'], 'mitra/destinations/{destination}', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'update']);
+    Route::post('mitra/destinations/{destination}/images', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'uploadImages']);
+    Route::delete('mitra/destinations/{destination}/images/{image}', [\App\Http\Controllers\Api\Mitra\DestinationController::class, 'deleteImage']);
 
     // Itineraries
     Route::apiResource('itineraries', ItineraryController::class);

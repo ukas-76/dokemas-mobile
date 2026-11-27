@@ -1,12 +1,29 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../../../config/api_config.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 import '../../../providers/mitra_provider.dart';
 
+class LocalImageItem {
+  final XFile file;
+  final Uint8List bytes;
+  LocalImageItem({required this.file, required this.bytes});
+}
+
 class MitraEditDestinasiPage extends StatefulWidget {
   final MitraDestinationSummary destination;
-  const MitraEditDestinasiPage({super.key, required this.destination});
+  final String? initialSection; // 'fasilitas' | 'galeri' | null
+
+  const MitraEditDestinasiPage({
+    super.key,
+    required this.destination,
+    this.initialSection,
+  });
 
   @override
   State<MitraEditDestinasiPage> createState() => _MitraEditDestinasiPageState();
@@ -14,6 +31,10 @@ class MitraEditDestinasiPage extends StatefulWidget {
 
 class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
   final _formKey = GlobalKey<FormState>();
+  final _scrollController = ScrollController();
+  final _fasilitasKey = GlobalKey();
+  final _galeriKey = GlobalKey();
+
   bool _saving = false;
   bool _is24Hours = false;
 
@@ -25,6 +46,16 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
   late final TextEditingController _csPhoneCtrl;
   late final TextEditingController _descCtrl;
   late final TextEditingController _mapsUrlCtrl;
+
+  // Facilities
+  List<Map<String, dynamic>> _allFacilities = [];
+  bool _loadingFacilities = true;
+  final Set<int> _selectedFacilityIds = {};
+
+  // Gallery Images
+  late List<Map<String, dynamic>> _existingImages;
+  final List<LocalImageItem> _newImages = [];
+  bool _isDeletingImage = false;
 
   @override
   void initState() {
@@ -39,10 +70,74 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
     _descCtrl = TextEditingController(text: d.description ?? '');
     _mapsUrlCtrl = TextEditingController(text: d.mapsUrl ?? '');
     _is24Hours = d.is24Hours;
+
+    // Existing facilities
+    for (final f in d.facilities) {
+      final id = f['id'];
+      if (id is int) {
+        _selectedFacilityIds.add(id);
+      } else if (id != null) {
+        final parsed = int.tryParse(id.toString());
+        if (parsed != null) _selectedFacilityIds.add(parsed);
+      }
+    }
+
+    // Existing images
+    _existingImages = List<Map<String, dynamic>>.from(d.images);
+
+    // Fetch master facilities
+    _fetchFacilities();
+
+    // Auto-scroll jika ada initialSection
+    if (widget.initialSection != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToSection(widget.initialSection!);
+      });
+    }
+  }
+
+  void _scrollToSection(String section) {
+    BuildContext? targetContext;
+    if (section == 'fasilitas') {
+      targetContext = _fasilitasKey.currentContext;
+    } else if (section == 'galeri') {
+      targetContext = _galeriKey.currentContext;
+    }
+    if (targetContext != null) {
+      Scrollable.ensureVisible(
+        targetContext,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  Future<void> _fetchFacilities() async {
+    try {
+      final res = await http.get(
+        Uri.parse(ApiConfig.facilities),
+        headers: ApiConfig.defaultHeaders,
+      );
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        final list = (data is List) ? data : (data['data'] as List? ?? []);
+        if (mounted) {
+          setState(() {
+            _allFacilities = list.map((e) => Map<String, dynamic>.from(e)).toList();
+            _loadingFacilities = false;
+          });
+        }
+        return;
+      }
+    } catch (_) {}
+    if (mounted) {
+      setState(() => _loadingFacilities = false);
+    }
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _nameCtrl.dispose();
     _addressCtrl.dispose();
     _districtCtrl.dispose();
@@ -54,40 +149,74 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
     super.dispose();
   }
 
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _saving = true);
+  Future<void> _pickNewImages() async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickMultiImage();
+      if (picked.isEmpty) return;
 
-    final fields = {
-      'destination_name': _nameCtrl.text.trim(),
-      'address': _addressCtrl.text.trim(),
-      'district': _districtCtrl.text.trim(),
-      'price': _priceCtrl.text.trim(),
-      'opening_hours': _openingHoursCtrl.text.trim(),
-      'cs_phone': _csPhoneCtrl.text.trim(),
-      'description': _descCtrl.text.trim(),
-      'maps_url': _mapsUrlCtrl.text.trim(),
-      'is_24_hours': _is24Hours ? '1' : '0',
-    };
+      for (final file in picked) {
+        final bytes = await file.readAsBytes();
+        setState(() {
+          _newImages.add(LocalImageItem(file: file, bytes: bytes));
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memilih gambar: $e')),
+        );
+      }
+    }
+  }
 
+  Future<void> _deleteExistingImage(Map<String, dynamic> img) async {
+    final imgId = img['id'];
+    if (imgId == null) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Foto Galeri?'),
+        content: const Text('Foto ini akan dihapus permanen dari galeri destinasi Anda.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true || !mounted) return;
+
+    setState(() => _isDeletingImage = true);
     final prov = context.read<MitraProvider>();
-    final error = await prov.updateDestination(
+    final parsedId = (imgId is int) ? imgId : int.parse(imgId.toString());
+    final error = await prov.deleteGalleryImage(
       destinationId: widget.destination.id,
-      fields: fields,
+      imageId: parsedId,
     );
 
     if (!mounted) return;
-    setState(() => _saving = false);
+    setState(() => _isDeletingImage = false);
 
     if (error == null) {
+      setState(() {
+        _existingImages.removeWhere((item) => item['id'] == imgId);
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('✅ Data destinasi berhasil diperbarui!'),
+          content: Text('✅ Foto berhasil dihapus'),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
       );
-      Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -97,6 +226,75 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
         ),
       );
     }
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _saving = true);
+
+    final fields = <String, dynamic>{
+      'name': _nameCtrl.text.trim(),
+      'address': _addressCtrl.text.trim(),
+      'district': _districtCtrl.text.trim(),
+      'price': _priceCtrl.text.trim(),
+      'opening_hours': _openingHoursCtrl.text.trim(),
+      'cs_phone': _csPhoneCtrl.text.trim(),
+      'description': _descCtrl.text.trim(),
+      'maps_url': _mapsUrlCtrl.text.trim(),
+      'is_24_hours': _is24Hours ? '1' : '0',
+      'facility_ids': _selectedFacilityIds.toList(),
+    };
+
+    final prov = context.read<MitraProvider>();
+    final error = await prov.updateDestination(
+      destinationId: widget.destination.id,
+      fields: fields,
+    );
+
+    if (!mounted) return;
+
+    if (error != null) {
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ $error'),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    // Jika ada foto baru yang dipilih, unggah sekarang
+    if (_newImages.isNotEmpty) {
+      final uploadError = await prov.uploadGalleryImages(
+        destinationId: widget.destination.id,
+        images: _newImages.map((e) => e.file).toList(),
+      );
+
+      if (!mounted) return;
+
+      if (uploadError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Peringatan: Data tersimpan, namun foto gagal: $uploadError'),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+
+    setState(() => _saving = false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('✅ Data destinasi, fasilitas & galeri berhasil diperbarui!'),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    Navigator.pop(context);
   }
 
   @override
@@ -116,9 +314,11 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
+          controller: _scrollController,
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
+              // 1. Informasi Utama
               _buildSection('Informasi Utama', [
                 _field(_nameCtrl, 'Nama Destinasi', Icons.label_outline, required: true),
                 _field(_addressCtrl, 'Alamat Lengkap', Icons.location_on_outlined, required: true, maxLines: 2),
@@ -126,12 +326,14 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
                 _field(_descCtrl, 'Deskripsi', Icons.description_outlined, maxLines: 4),
               ]),
               const SizedBox(height: 16),
-              _buildSection('Operasional', [
+
+              // 2. Operasional
+              _buildSection('Operasional & Kontak', [
                 _field(_priceCtrl, 'Harga Tiket (0 = Gratis)', Icons.attach_money, keyboardType: TextInputType.number),
                 Row(
                   children: [
                     Expanded(
-                      child: _field(_openingHoursCtrl, 'Jam Buka (08:00 - 17:00)', Icons.access_time_outlined,
+                      child: _field(_openingHoursCtrl, 'Jam Buka (contoh: 08:00 - 17:00)', Icons.access_time_outlined,
                           enabled: !_is24Hours),
                     ),
                   ],
@@ -145,22 +347,33 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
                   onChanged: (v) => setState(() => _is24Hours = v),
                 ),
                 _field(_csPhoneCtrl, 'Nomor WA / CS', Icons.phone_outlined, keyboardType: TextInputType.phone),
-              ]),
-              const SizedBox(height: 16),
-              _buildSection('Lokasi', [
                 _field(_mapsUrlCtrl, 'Link Google Maps', Icons.link_rounded),
               ]),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+
+              // 3. Pilihan Fasilitas (Key: _fasilitasKey)
+              Container(
+                key: _fasilitasKey,
+                child: _buildFacilitiesSection(),
+              ),
+              const SizedBox(height: 16),
+
+              // 4. Galeri Foto Wisata (Key: _galeriKey)
+              Container(
+                key: _galeriKey,
+                child: _buildGallerySection(),
+              ),
+              const SizedBox(height: 24),
 
               // Tombol Simpan
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
-                  onPressed: _saving ? null : _save,
+                  onPressed: (_saving || _isDeletingImage) ? null : _save,
                   icon: _saving
                       ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                       : const Icon(Icons.save_outlined),
-                  label: Text(_saving ? 'Menyimpan...' : 'Simpan Perubahan'),
+                  label: Text(_saving ? 'Menyimpan Perubahan...' : 'Simpan Semua Perubahan'),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -174,6 +387,279 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
         ),
       ),
     );
+  }
+
+  // ─── Section Fasilitas ──────────────────────────────────────────────────────
+  Widget _buildFacilitiesSection() {
+    return _buildSection(
+      'Fasilitas Tersedia',
+      [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Pilih fasilitas yang ada di destinasi:',
+              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${_selectedFacilityIds.length} Dipilih',
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (_loadingFacilities)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          )
+        else if (_allFacilities.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Text('Tidak ada daftar fasilitas master ditemukan.', style: TextStyle(color: AppColors.textMuted)),
+          )
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _allFacilities.map((f) {
+              final id = f['id'] as int;
+              final name = f['name']?.toString() ?? 'Fasilitas';
+              final isSelected = _selectedFacilityIds.contains(id);
+              final icon = _getFacilityIcon(name);
+
+              return FilterChip(
+                selected: isSelected,
+                label: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 15,
+                      color: isSelected ? Colors.white : AppColors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(name),
+                  ],
+                ),
+                labelStyle: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? Colors.white : const Color(0xFF1E293B),
+                ),
+                selectedColor: AppColors.primary,
+                backgroundColor: const Color(0xFFF1F5F9),
+                checkmarkColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(
+                    color: isSelected ? AppColors.primary : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                onSelected: (selected) {
+                  setState(() {
+                    if (selected) {
+                      _selectedFacilityIds.add(id);
+                    } else {
+                      _selectedFacilityIds.remove(id);
+                    }
+                  });
+                },
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+
+  // ─── Section Galeri Foto ────────────────────────────────────────────────────
+  Widget _buildGallerySection() {
+    final totalPhotos = _existingImages.length + _newImages.length;
+
+    return _buildSection(
+      'Galeri Foto Wisata',
+      [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Kelola foto-foto galeri destinasi:',
+              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+            ),
+            Text(
+              '$totalPhotos Foto',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        // List Foto Yang Sudah Ada
+        if (_existingImages.isNotEmpty) ...[
+          const Text(
+            'Foto Saat Ini (Tersimpan):',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 96,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _existingImages.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
+              itemBuilder: (ctx, i) {
+                final img = _existingImages[i];
+                final url = (img['image_url'] ?? img['url'] ?? img['image_path'] ?? '').toString();
+
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        width: 120,
+                        height: 96,
+                        color: const Color(0xFFE2E8F0),
+                        child: Image.network(
+                          url,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => const Center(
+                            child: Icon(Icons.broken_image_outlined, color: AppColors.textMuted),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () => _deleteExistingImage(img),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.redAccent,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.delete_outline, size: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
+
+        // List Foto Baru Yang Belum Diupload
+        if (_newImages.isNotEmpty) ...[
+          const Text(
+            'Foto Baru Yang Akan Diunggah:',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1E6F1D)),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 96,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _newImages.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
+              itemBuilder: (ctx, i) {
+                final item = _newImages[i];
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        width: 120,
+                        height: 96,
+                        color: const Color(0xFFE2E8F0),
+                        child: Image.memory(
+                          item.bytes,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () => setState(() => _newImages.removeAt(i)),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close_rounded, size: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 4,
+                      left: 4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E6F1D),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'BARU',
+                          style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
+
+        // Tombol Tambah Foto
+        OutlinedButton.icon(
+          onPressed: _pickNewImages,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            side: const BorderSide(color: AppColors.primary),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          icon: const Icon(Icons.add_photo_alternate_outlined, size: 20),
+          label: const Text('Pilih Foto Baru dari Galeri HP', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+      ],
+    );
+  }
+
+  IconData _getFacilityIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('toilet') || lower.contains('wc')) return Icons.wc_rounded;
+    if (lower.contains('parkir')) return Icons.local_parking_rounded;
+    if (lower.contains('musholla') || lower.contains('masjid')) return Icons.mosque_rounded;
+    if (lower.contains('makan') || lower.contains('warung') || lower.contains('kuliner')) return Icons.restaurant_rounded;
+    if (lower.contains('foto') || lower.contains('spot')) return Icons.camera_alt_rounded;
+    if (lower.contains('wifi') || lower.contains('internet')) return Icons.wifi_rounded;
+    if (lower.contains('anak') || lower.contains('bermain')) return Icons.toys_rounded;
+    if (lower.contains('penginapan') || lower.contains('hotel')) return Icons.hotel_rounded;
+    return Icons.check_circle_outline_rounded;
   }
 
   Widget _buildSection(String title, List<Widget> children) {

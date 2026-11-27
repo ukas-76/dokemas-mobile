@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Mitra;
 
 use App\Http\Controllers\Controller;
 use App\Models\Destination;
+use App\Models\DestinationImage;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -168,6 +169,69 @@ class DestinationController extends Controller
         return response()->json([
             'message' => 'Data destinasi berhasil diperbarui dan diajukan untuk kurasi.',
             'destination' => $destination->fresh()->load(['category', 'facilities', 'images']),
+        ]);
+    }
+
+    /**
+     * Upload satu atau banyak foto galeri untuk destinasi mitra.
+     */
+    public function uploadImages(Request $request, Destination $destination)
+    {
+        $this->ensureMitra($request);
+
+        if ($destination->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Anda tidak memiliki hak akses untuk destinasi ini.'], 403);
+        }
+
+        $request->validate([
+            'images' => ['required_without:image', 'array'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'image' => ['required_without:images', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'caption' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $files = $request->file('images', []);
+        if ($request->hasFile('image')) {
+            $files[] = $request->file('image');
+        }
+
+        $created = [];
+        foreach ($files as $file) {
+            $path = $this->images->storeAsWebp($file, 'destinations');
+            $img = $destination->images()->create([
+                'image_path' => $path,
+                'caption' => $request->input('caption'),
+            ]);
+            $created[] = $img;
+        }
+
+        return response()->json([
+            'message' => count($created).' foto berhasil ditambahkan ke galeri destinasi.',
+            'images' => $destination->fresh()->images,
+        ], 201);
+    }
+
+    /**
+     * Hapus foto galeri destinasi mitra.
+     */
+    public function deleteImage(Request $request, Destination $destination, DestinationImage $image)
+    {
+        $this->ensureMitra($request);
+
+        if ($destination->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Anda tidak memiliki hak akses untuk destinasi ini.'], 403);
+        }
+
+        if ($image->destination_id !== $destination->id) {
+            return response()->json(['message' => 'Foto tidak terkait dengan destinasi ini.'], 404);
+        }
+
+        $this->images->delete($image->image_path);
+        $image->delete();
+
+        return response()->json([
+            'message' => 'Foto galeri berhasil dihapus.',
+            'images' => $destination->fresh()->images,
         ]);
     }
 
