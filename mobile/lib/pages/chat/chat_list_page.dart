@@ -20,10 +20,10 @@ class _ChatListPageState extends State<ChatListPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  void _load() {
+  Future<void> _load() async {
     final token = context.read<AuthProvider>().token;
     if (token != null) {
-      context.read<ChatProvider>().fetchConversations(token);
+      await context.read<ChatProvider>().fetchConversations(token);
     }
   }
 
@@ -65,7 +65,7 @@ class _ChatListPageState extends State<ChatListPage> {
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: chat.conversations.length,
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (_, _) =>
                         Divider(height: 1, color: AppColors.border),
                     itemBuilder: (_, i) =>
                         _ConversationTile(

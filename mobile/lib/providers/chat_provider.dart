@@ -17,6 +17,7 @@ class ChatProvider extends ChangeNotifier {
 
   List<ChatConversation> get conversations => _conversations;
   List<ChatMessage> get messages => _messages;
+  int? get activeConversationId => _activeConversationId;
   int get unreadCount => _unreadCount;
   bool get loading => _loading;
   bool get sendingMessage => _sendingMessage;
