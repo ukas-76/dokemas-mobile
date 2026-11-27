@@ -19,15 +19,23 @@ class AuthProvider with ChangeNotifier {
   Future<void> checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString('auth_token');
+    final savedUser = prefs.getString('user_data');
 
     if (savedToken != null) {
       _token = savedToken;
-      _isLoggedIn = true;
+      if (savedUser != null) {
+        try {
+          _user = UserModel.fromJson(jsonDecode(savedUser));
+          _isLoggedIn = true;
+        } catch (_) {}
+      }
       notifyListeners();
 
       // Coba fetch user data terbaru
       await fetchUser();
     } else {
+      _token = null;
+      _user = null;
       _isLoggedIn = false;
       notifyListeners();
     }
@@ -47,13 +55,21 @@ class AuthProvider with ChangeNotifier {
         final data = jsonDecode(response.body);
         final userData = data['user'] ?? data['data'] ?? data;
         _user = UserModel.fromJson(userData);
+        _isLoggedIn = true;
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_data', jsonEncode(userData));
         notifyListeners();
-      } else {
+      } else if (response.statusCode == 401) {
         // Jika token tidak valid / expired
         await logout();
       }
     } catch (e) {
       debugPrint("Error fetching user: $e");
+      if (_user == null) {
+        _isLoggedIn = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -75,9 +91,10 @@ class AuthProvider with ChangeNotifier {
         _user = UserModel.fromJson(data['user']);
         _isLoggedIn = true;
 
-        // Simpan token ke SharedPreferences
+        // Simpan token dan data user ke SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', _token!);
+        await prefs.setString('user_data', jsonEncode(data['user']));
 
         notifyListeners();
         return null; // null berarti sukses (tidak ada error)
@@ -338,6 +355,7 @@ class AuthProvider with ChangeNotifier {
     // Hapus token dari SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
+    await prefs.remove('user_data');
 
     notifyListeners();
   }

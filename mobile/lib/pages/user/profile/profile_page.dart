@@ -10,6 +10,7 @@ import 'ulasan_saya_page.dart';
 import '../../chat/chat_list_page.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../auth/login_page.dart';
 import '../../main_screen.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -205,6 +206,31 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
+                  if (user == null) ...[
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1E6F1D),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      icon: const Icon(Icons.login_rounded, size: 16),
+                      label: const Text(
+                        'Masuk / Login Akun',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

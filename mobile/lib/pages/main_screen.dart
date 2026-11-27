@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    final bool isLoggedIn = authProvider.isLoggedIn;
+    final bool isLoggedIn = authProvider.isLoggedIn && authProvider.user != null;
     final String? role = authProvider.user?.role;
 
     // Jika sedang login sebagai Mitra atau Admin, langsung tampilkan Shell masing-masing
