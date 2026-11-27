@@ -7,6 +7,7 @@ import 'edit_profile_page.dart';
 import 'riwayat_itinerary_page.dart';
 import 'change_password_page.dart';
 import 'ulasan_saya_page.dart';
+import '../../chat/chat_list_page.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../main_screen.dart';
@@ -272,6 +273,18 @@ class _ProfilePageState extends State<ProfilePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => const UlasanSayaPage(),
+                      ),
+                    );
+                  },
+                ),
+                _SettingsTile(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  title: 'Pesan / Chat Mitra',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChatListPage(),
                       ),
                     );
                   },

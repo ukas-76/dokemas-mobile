@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DestinationController;
 use App\Http\Controllers\Api\FacilityController;
 use App\Http\Controllers\Api\ItineraryController;
+use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WishlistController;
 use Illuminate\Support\Facades\Route;
@@ -75,6 +76,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist', [WishlistController::class, 'store']);
     Route::post('wishlist/toggle', [WishlistController::class, 'toggle']);
     Route::delete('wishlist/{destination}', [WishlistController::class, 'destroy']);
+
+    // Chat / Percakapan
+    Route::get('conversations/unread-count', [ConversationController::class, 'unreadCount']);
+    Route::get('conversations', [ConversationController::class, 'index']);
+    Route::post('conversations', [ConversationController::class, 'store']);
+    Route::get('conversations/{id}/messages', [ConversationController::class, 'messages']);
+    Route::post('conversations/{id}/messages', [ConversationController::class, 'sendMessage']);
 
     // Portal Mitra (Pendaftaran & Manajemen Destinasi)
     Route::get('mitra/status', [\App\Http\Controllers\Api\MitraRegistrationController::class, 'status']);

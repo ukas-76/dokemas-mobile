@@ -9,6 +9,8 @@ import '../providers/itinerary_provider.dart';
 import '../providers/wishlist_provider.dart';
 import '../service/api_service.dart';
 import '../widgets/dokemas_logo.dart';
+import '../providers/chat_provider.dart';
+import 'chat/chat_room_page.dart';
 import 'auth/login_page.dart';
 import 'user/itinerary/itinerary_list_page.dart';
 
@@ -157,6 +159,57 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleChatMitraFlow() async {
+    final auth = context.read<AuthProvider>();
+    final token = auth.token;
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silahkan login terlebih dahulu untuk menghubungi mitra'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF1E6F1D)),
+      ),
+    );
+
+    final conv = await context
+        .read<ChatProvider>()
+        .openConversation(token, widget.destinationId);
+
+    if (mounted) {
+      Navigator.pop(context);
+      if (conv != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatRoomPage(conversation: conv),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Destinasi ini belum terhubung dengan akun mitra aktif.',
+            ),
+            backgroundColor: Colors.redAccent,
+          ),
         );
       }
     }
@@ -1127,6 +1180,8 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                     const SizedBox(height: 22),
                     _buildReviewsSection(),
                     const SizedBox(height: 18),
+                    _buildHubungiMitraCard(),
+                    const SizedBox(height: 14),
                     _buildExplorationTipsCard(),
                   ] else if (_selectedTabIndex == 1) ...[
                     _buildFacilitiesSection(),
@@ -1206,6 +1261,30 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                 ],
               ),
             ),
+
+            // Chat Mitra Square Button
+            SizedBox(
+              width: 48,
+              height: 48,
+              child: OutlinedButton(
+                onPressed: _handleChatMitraFlow,
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  backgroundColor: const Color(0xFFF1F5F9),
+                  side: const BorderSide(color: Color(0xFFE2E8F0)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: Color(0xFF1E6F1D),
+                  size: 21,
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 8),
 
             // Add to Itinerary Square Button
             SizedBox(
@@ -1871,6 +1950,83 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
         ),
         _buildReviewCard(),
       ],
+    );
+  }
+
+  Widget _buildHubungiMitraCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0FDF4),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFBBF7D0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E6F1D).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: Color(0xFF1E6F1D),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tanya Pengelola Destinasi',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Chat langsung dengan mitra resmi',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _handleChatMitraFlow,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E6F1D),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: const Icon(Icons.forum_outlined, size: 18),
+              label: const Text(
+                'Mulai Chat dengan Mitra',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

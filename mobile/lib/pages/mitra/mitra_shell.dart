@@ -6,6 +6,7 @@ import 'dashboard/mitra_dashboard_page.dart';
 import 'destinasi/mitra_destinasi_page.dart';
 import 'ulasan/mitra_ulasan_page.dart';
 import 'profil/mitra_profil_page.dart';
+import '../chat/chat_list_page.dart';
 
 class MitraShell extends StatefulWidget {
   const MitraShell({super.key});
@@ -20,6 +21,7 @@ class _MitraShellState extends State<MitraShell> {
   static const _titles = [
     'Dashboard Mitra',
     'Destinasi Saya',
+    'Pesan Masuk',
     'Ulasan Pengunjung',
     'Profil Mitra',
   ];
@@ -27,6 +29,7 @@ class _MitraShellState extends State<MitraShell> {
   late final List<Widget> _pages = [
     MitraDashboardPage(onNavigateToDestinasi: () => setState(() => _index = 1)),
     const MitraDestinasiPage(),
+    const ChatListPage(),
     const MitraUlasanPage(),
     const MitraProfilPage(),
   ];
@@ -97,7 +100,7 @@ class _MitraShellState extends State<MitraShell> {
           setState(() => _index = i);
           if (i == 0) {
             context.read<MitraProvider>().fetchStatus();
-          } else if (i == 2) {
+          } else if (i == 3) {
             context.read<MitraProvider>().fetchReviews();
           }
         },
@@ -113,6 +116,11 @@ class _MitraShellState extends State<MitraShell> {
             icon: Icon(Icons.location_on_outlined),
             selectedIcon: Icon(Icons.location_on_rounded, color: AppColors.primary),
             label: 'Destinasi',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.chat_bubble_outline_rounded),
+            selectedIcon: Icon(Icons.chat_bubble_rounded, color: AppColors.primary),
+            label: 'Pesan',
           ),
           NavigationDestination(
             icon: Icon(Icons.rate_review_outlined),
