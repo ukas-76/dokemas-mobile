@@ -112,6 +112,70 @@ class DestinationController extends Controller
     }
 
     /**
+     * Dapatkan daftar penginapan / hotel terdekat dari destinasi ini.
+     * Radius maksimal 2.0 km sesuai spesifikasi.
+     */
+    public function nearbyAccommodations(Request $request, Destination $destination)
+    {
+        $lat = $destination->latitude;
+        $lng = $destination->longitude;
+
+        if (is_null($lat) || is_null($lng)) {
+            return response()->json([
+                'destination_id' => $destination->id,
+                'radius_km' => 2.0,
+                'data' => [],
+            ]);
+        }
+
+        $radius = min((float) $request->query('radius', 2.0), 2.0);
+
+        // Haversine formula dalam kilometer
+        $haversine = "(6371 * acos(LEAST(1.0, GREATEST(-1.0, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))))";
+
+        $accommodations = Destination::query()
+            ->select('destinations.*')
+            ->selectRaw("{$haversine} AS distance_km", [$lat, $lng, $lat])
+            ->where('status', 'published')
+            ->where('id', '!=', $destination->id)
+            ->whereHas('category', function ($q) {
+                $q->where('slug', 'like', '%hotel%')
+                  ->orWhere('slug', 'like', '%penginapan%');
+            })
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->having('distance_km', '<=', $radius)
+            ->orderBy('distance_km', 'asc')
+            ->limit(10)
+            ->get();
+
+        $data = $accommodations->map(function ($item) {
+            $dist = round((float) $item->distance_km, 2);
+            $distText = $dist < 1.0 ? round($dist * 1000) . ' m' : $dist . ' km';
+
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'slug' => $item->slug,
+                'thumbnail_url' => $item->thumbnail_url,
+                'price' => $item->price,
+                'rating_avg' => $item->rating_avg,
+                'rating_count' => $item->rating_count,
+                'district' => $item->district,
+                'address' => $item->address,
+                'distance_km' => $dist,
+                'distance_text' => $distText,
+            ];
+        });
+
+        return response()->json([
+            'destination_id' => $destination->id,
+            'radius_km' => $radius,
+            'data' => $data,
+        ]);
+    }
+
+    /**
      * Kurasi status destinasi oleh admin (published, pending, draft, archived).
      */
     public function updateStatus(Request $request, Destination $destination)

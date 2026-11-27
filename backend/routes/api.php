@@ -48,6 +48,7 @@ Route::get('categories/{category}', [CategoryController::class, 'show']);
 Route::get('facilities', [FacilityController::class, 'index']);
 Route::get('destinations', [DestinationController::class, 'index']);
 Route::get('destinations/{destination}', [DestinationController::class, 'show']);
+Route::get('destinations/{destination}/nearby-accommodations', [DestinationController::class, 'nearbyAccommodations']);
 Route::get('destinations/{destination}/reviews', [ReviewController::class, 'index']);
 
 /*

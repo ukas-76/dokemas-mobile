@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../models/destination.dart';
 import '../models/facility.dart';
 import '../models/itinerary_model.dart';
 import '../models/review.dart';
@@ -58,10 +59,37 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
   bool _isDescriptionExpanded = false;
   int _currentHeroPage = 0;
 
+  List<Map<String, dynamic>> _nearbyHotels = [];
+  bool _isLoadingNearby = true;
+
   @override
   void initState() {
     super.initState();
     _fetchReviews();
+    _fetchNearbyAccommodations();
+  }
+
+  Future<void> _fetchNearbyAccommodations() async {
+    setState(() {
+      _isLoadingNearby = true;
+    });
+    try {
+      final apiService = ApiService();
+      final hotels = await apiService.fetchNearbyAccommodations(
+        widget.destinationId,
+        radius: 2.0,
+      );
+      if (!mounted) return;
+      setState(() {
+        _nearbyHotels = hotels;
+        _isLoadingNearby = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingNearby = false;
+      });
+    }
   }
 
   List<String> get _allPhotos {
@@ -1178,6 +1206,8 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                     const SizedBox(height: 22),
                     _buildLocationMapSection(),
                     const SizedBox(height: 22),
+                    _buildNearbyAccommodationsSection(),
+                    const SizedBox(height: 22),
                     _buildReviewsSection(),
                     const SizedBox(height: 18),
                     _buildHubungiMitraCard(),
@@ -1897,6 +1927,358 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  String _formatPriceCurrency(num? price) {
+    if (price == null || price == 0) return 'Gratis';
+    final intVal = price.toInt();
+    final formatted = intVal.toString().replaceAll(RegExp(r'\B(?=(\d{3})+(?!\d))'), '.');
+    return 'Rp $formatted';
+  }
+
+  Future<void> _openNearbyDestination(Map<String, dynamic> hotel) async {
+    final hotelId = hotel['id'] as int;
+    Destination? detail;
+    try {
+      detail = await ApiService().fetchDestinationDetail(hotelId);
+    } catch (_) {}
+
+    if (!mounted) return;
+
+    if (detail != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DetailDestinasiScreen(
+            destinationId: detail!.id ?? hotelId,
+            title: detail.name,
+            imageUrl: detail.imageUrl,
+            rating: detail.rating > 0 ? detail.rating.toStringAsFixed(1) : '4.5',
+            reviewCount: '${detail.reviews} ulasan',
+            location: detail.area.isNotEmpty ? detail.area : (hotel['address'] ?? 'Banyumas'),
+            price: detail.price > 0 ? _formatPriceCurrency(detail.price) : 'Gratis',
+            distance: hotel['distance_text'] ?? '-',
+            openingHours: '${detail.openHour} - ${detail.closeHour}',
+            description: detail.description,
+            galleryImages: detail.images.map((e) => e.imageUrl).toList(),
+            category: detail.category,
+            facilities: detail.facilities,
+          ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DetailDestinasiScreen(
+            destinationId: hotelId,
+            title: hotel['name'] ?? '',
+            imageUrl: hotel['thumbnail_url'] ?? '',
+            rating: (hotel['rating_avg'] != null ? (hotel['rating_avg'] as num).toDouble() : 4.5).toStringAsFixed(1),
+            reviewCount: '${hotel['rating_count'] ?? 0} ulasan',
+            location: hotel['address'] ?? hotel['district'] ?? 'Banyumas',
+            price: hotel['price'] != null && hotel['price'] > 0
+                ? _formatPriceCurrency(hotel['price'])
+                : 'Gratis',
+            distance: hotel['distance_text'] ?? '-',
+            openingHours: '24 Jam',
+            description: '',
+            category: 'Hotel & Penginapan',
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildNearbyAccommodationsSection() {
+    if (!_isLoadingNearby && _nearbyHotels.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.hotel_rounded,
+                    size: 18,
+                    color: Color(0xFF0F766E),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Penginapan Terdekat',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.radar_rounded, size: 12, color: Color(0xFF0F766E)),
+                  SizedBox(width: 4),
+                  Text(
+                    'Radius ≤ 2 km',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F766E),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (_isLoadingNearby)
+          const SizedBox(
+            height: 190,
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0F766E)),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Mencari hotel & penginapan terdekat...',
+                    style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          SizedBox(
+            height: 205,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: _nearbyHotels.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final hotel = _nearbyHotels[index];
+                return _buildNearbyHotelCard(hotel);
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildNearbyHotelCard(Map<String, dynamic> hotel) {
+    final String title = hotel['name'] ?? '';
+    final String thumb = hotel['thumbnail_url'] ?? '';
+    final String distText = hotel['distance_text'] ?? '';
+    final num? price = hotel['price'];
+    final rating = hotel['rating_avg'] != null ? (hotel['rating_avg'] as num).toDouble() : 4.5;
+    final String district = hotel['district'] ?? 'Banyumas';
+
+    return InkWell(
+      onTap: () => _openNearbyDestination(hotel),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: 185,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image + Badges
+            Stack(
+              children: [
+                SizedBox(
+                  height: 98,
+                  width: double.infinity,
+                  child: thumb.isNotEmpty
+                      ? Image.network(
+                          thumb,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: const Color(0xFFF1F5F9),
+                            child: const Icon(
+                              Icons.hotel_rounded,
+                              color: Color(0xFF94A3B8),
+                              size: 32,
+                            ),
+                          ),
+                        )
+                      : Container(
+                          color: const Color(0xFFF1F5F9),
+                          child: const Icon(
+                            Icons.hotel_rounded,
+                            color: Color(0xFF94A3B8),
+                            size: 32,
+                          ),
+                        ),
+                ),
+                // Distance Badge (Top Left)
+                Positioned(
+                  top: 6,
+                  left: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0F172A).withValues(alpha: 0.78),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.near_me_rounded,
+                          size: 10,
+                          color: Color(0xFF34D399),
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          distText,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Rating Badge (Top Right)
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
+                          size: 11,
+                          color: Color(0xFFF59E0B),
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          rating.toStringAsFixed(1),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Details
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 11,
+                        color: Color(0xFF94A3B8),
+                      ),
+                      const SizedBox(width: 2),
+                      Expanded(
+                        child: Text(
+                          district,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            color: Color(0xFF64748B),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    price != null && price > 0
+                        ? '${_formatPriceCurrency(price)} /mlm'
+                        : 'Gratis',
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F766E),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

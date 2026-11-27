@@ -168,4 +168,51 @@ class ApiService {
       throw Exception('Gagal terhubung ke server backend: $e');
     }
   }
+
+  Future<List<Map<String, dynamic>>> fetchNearbyAccommodations(
+    int destinationId, {
+    double radius = 2.0,
+  }) async {
+    try {
+      final uri = Uri.parse(
+        '${ApiConfig.destinations}/$destinationId/nearby-accommodations?radius=$radius',
+      );
+      final response = await http.get(
+        uri,
+        headers: ApiConfig.defaultHeaders,
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic> && decoded['data'] is List) {
+          return List<Map<String, dynamic>>.from(decoded['data']);
+        }
+        return [];
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<Destination?> fetchDestinationDetail(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.destinations}/$id'),
+        headers: ApiConfig.defaultHeaders,
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        final data = decoded is Map<String, dynamic> && decoded.containsKey('data')
+            ? decoded['data']
+            : decoded;
+        return Destination.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }
