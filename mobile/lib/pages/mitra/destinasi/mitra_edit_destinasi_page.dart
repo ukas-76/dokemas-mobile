@@ -228,6 +228,39 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
     }
   }
 
+  Future<void> _setCover(Map<String, dynamic> img) async {
+    final imgId = img['id'];
+    if (imgId == null) return;
+    final parsedId = (imgId is int) ? imgId : int.parse(imgId.toString());
+
+    setState(() => _saving = true);
+    final prov = context.read<MitraProvider>();
+    final error = await prov.setCoverImage(
+      destinationId: widget.destination.id,
+      imageId: parsedId,
+    );
+    if (!mounted) return;
+    setState(() => _saving = false);
+
+    if (error == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('🌟 Foto cover utama berhasil diperbarui!'),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ $error'),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
@@ -555,6 +588,31 @@ class _MitraEditDestinasiPageState extends State<MitraEditDestinasiPage> {
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.delete_outline, size: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 4,
+                      left: 4,
+                      child: GestureDetector(
+                        onTap: () => _setCover(img),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.star_rounded, size: 12, color: Colors.amber),
+                              SizedBox(width: 3),
+                              Text(
+                                'Jadikan Cover',
+                                style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -81,6 +81,21 @@ class MitraDestinationSummary {
   final String? mapsUrl;
   final bool is24Hours;
 
+  String? get effectiveThumbnailUrl {
+    if (thumbnailUrl != null && thumbnailUrl!.isNotEmpty) {
+      return thumbnailUrl;
+    }
+    if (images.isNotEmpty) {
+      final img = images.first;
+      final url = (img['image_url'] ?? img['url'] ?? img['image_path'] ?? '').toString();
+      if (url.isNotEmpty) {
+        if (url.startsWith('http')) return url.replaceFirst('http://', 'https://');
+        return '${ApiConfig.storageBaseUrl}/$url';
+      }
+    }
+    return null;
+  }
+
   MitraDestinationSummary({
     required this.id,
     required this.name,
@@ -339,6 +354,32 @@ class MitraProvider with ChangeNotifier {
       } else {
         final body = jsonDecode(resp.body);
         return body['message'] ?? 'Gagal menghapus foto';
+      }
+    } catch (e) {
+      return 'Koneksi gagal: $e';
+    }
+  }
+
+  /// Jadikan salah satu foto galeri sebagai foto cover utama
+  Future<String?> setCoverImage({
+    required int destinationId,
+    required int imageId,
+  }) async {
+    try {
+      final token = await _getToken();
+      final url = '${ApiConfig.mitraDestinations}/$destinationId/set-cover';
+      final resp = await http.post(
+        Uri.parse(url),
+        headers: ApiConfig.authHeaders(token),
+        body: jsonEncode({'image_id': imageId}),
+      ).timeout(const Duration(seconds: 20));
+
+      if (resp.statusCode == 200) {
+        await fetchStatus();
+        return null;
+      } else {
+        final body = jsonDecode(resp.body);
+        return body['message'] ?? 'Gagal mengatur cover utama';
       }
     } catch (e) {
       return 'Koneksi gagal: $e';

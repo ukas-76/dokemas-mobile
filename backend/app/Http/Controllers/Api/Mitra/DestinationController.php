@@ -205,6 +205,11 @@ class DestinationController extends Controller
             $created[] = $img;
         }
 
+        // Jika belum memiliki thumbnail, otomatis jadikan foto pertama yang diunggah sebagai cover
+        if (empty($destination->thumbnail) && !empty($created)) {
+            $destination->update(['thumbnail' => $created[0]->image_path]);
+        }
+
         return response()->json([
             'message' => count($created).' foto berhasil ditambahkan ke galeri destinasi.',
             'images' => $destination->fresh()->images,
@@ -232,6 +237,33 @@ class DestinationController extends Controller
         return response()->json([
             'message' => 'Foto galeri berhasil dihapus.',
             'images' => $destination->fresh()->images,
+        ]);
+    }
+
+    /**
+     * Jadikan salah satu foto galeri sebagai cover utama destinasi.
+     */
+    public function setCover(Request $request, Destination $destination)
+    {
+        $this->ensureMitra($request);
+
+        if ($destination->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Anda tidak memiliki hak akses untuk destinasi ini.'], 403);
+        }
+
+        $request->validate([
+            'image_id' => ['required', 'integer', 'exists:destination_images,id'],
+        ]);
+
+        $img = DestinationImage::where('id', $request->image_id)
+            ->where('destination_id', $destination->id)
+            ->firstOrFail();
+
+        $destination->update(['thumbnail' => $img->image_path]);
+
+        return response()->json([
+            'message' => 'Foto cover utama berhasil diperbarui.',
+            'destination' => $destination->fresh()->load(['category', 'facilities', 'images']),
         ]);
     }
 

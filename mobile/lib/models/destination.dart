@@ -62,9 +62,13 @@ class Destination {
     this.lng,
   });
 
-  String get imageUrl => thumbnailUrl.isNotEmpty 
-      ? thumbnailUrl 
-      : 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=300';
+  String get imageUrl {
+    if (thumbnailUrl.isNotEmpty) return thumbnailUrl;
+    if (images.isNotEmpty && images.first.imageUrl.isNotEmpty) {
+      return images.first.imageUrl;
+    }
+    return 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=300';
+  }
 
   /// Fungsi untuk mapping data dari Database/API JSON yang aman
   factory Destination.fromJson(Map<String, dynamic> json) {
@@ -143,7 +147,7 @@ class Destination {
           ? double.tryParse(json['longitude'].toString())
           : null,
       thumbnailUrl: () {
-        String rawThumb = (json['thumbnail_url'] ?? '').toString();
+        String rawThumb = (json['thumbnail_url'] ?? json['thumbnail'] ?? '').toString();
         if (rawThumb.isNotEmpty && !rawThumb.startsWith('http')) {
           return '${ApiConfig.storageBaseUrl}/$rawThumb';
         }

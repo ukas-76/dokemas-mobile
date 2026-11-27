@@ -208,7 +208,8 @@ class _MitraDestinasiPageState extends State<MitraDestinasiPage> {
 
   // ─── 1. Hero Banner ─────────────────────────────────────────────────────────
   Widget _buildHeroBanner(BuildContext context, MitraDestinationSummary dest) {
-    final hasThumb = dest.thumbnailUrl != null && dest.thumbnailUrl!.isNotEmpty;
+    final thumb = dest.effectiveThumbnailUrl;
+    final hasThumb = thumb != null && thumb.isNotEmpty;
 
     return Stack(
       children: [
@@ -220,7 +221,7 @@ class _MitraDestinasiPageState extends State<MitraDestinasiPage> {
             color: const Color(0xFF071B34),
             image: hasThumb
                 ? DecorationImage(
-                    image: NetworkImage(dest.thumbnailUrl!),
+                    image: NetworkImage(thumb),
                     fit: BoxFit.cover,
                   )
                 : null,

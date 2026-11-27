@@ -28,10 +28,12 @@ class Destination extends Model
     protected function thumbnailUrl(): Attribute
     {
         return Attribute::get(function (mixed $value, array $attributes) {
-            if (empty($attributes['thumbnail'])) {
-                return null;
+            $thumb = $attributes['thumbnail'] ?? null;
+            if (empty($thumb)) {
+                return $this->relationLoaded('images')
+                    ? $this->images->first()?->image_url
+                    : $this->images()->first()?->image_url;
             }
-            $thumb = $attributes['thumbnail'];
             if (str_starts_with($thumb, 'http://') || str_starts_with($thumb, 'https://')) {
                 return $thumb;
             }
