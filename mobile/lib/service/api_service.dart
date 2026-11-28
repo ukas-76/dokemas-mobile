@@ -7,10 +7,10 @@ import '../models/review.dart';
 import '../config/api_config.dart';
 
 class ApiService {
-  Future<List<Destination>> fetchDestinations() async {
+  Future<List<Destination>> fetchDestinations({int perPage = 50}) async {
     try {
       final response = await http.get(
-        Uri.parse(ApiConfig.destinations),
+        Uri.parse('${ApiConfig.destinations}?per_page=$perPage'),
         headers: ApiConfig.defaultHeaders,
       );
 

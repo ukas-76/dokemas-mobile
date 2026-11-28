@@ -66,7 +66,7 @@ class DestinationController extends Controller
             default => $query->latest(),
         };
 
-        return $query->paginate($request->integer('per_page', 15));
+        return $query->paginate($request->integer('per_page', 50));
     }
 
     public function store(Request $request)
