@@ -67,7 +67,7 @@ class _MitraDestinasiPageState extends State<MitraDestinasiPage> {
         builder: (_) => DetailDestinasiScreen(
           destinationId: dest.id,
           title: dest.name,
-          imageUrl: dest.thumbnailUrl ?? '',
+          imageUrl: dest.effectiveThumbnailUrl ?? dest.thumbnailUrl ?? '',
           rating: dest.ratingAvg > 0 ? dest.ratingAvg.toStringAsFixed(1) : '4.5',
           reviewCount: '${dest.ratingCount}',
           location: dest.address ?? (dest.district != null ? '${dest.district}, Banyumas' : 'Banyumas'),
@@ -75,6 +75,11 @@ class _MitraDestinasiPageState extends State<MitraDestinasiPage> {
           distance: '0 km',
           openingHours: dest.is24Hours ? 'Buka 24 Jam' : (dest.openingHours ?? '08:00 - 17:00'),
           description: dest.description ?? 'Destinasi mitra resmi DOKEMAS Banyumas.',
+          galleryImages: dest.images.map((img) {
+            final url = (img['image_url'] ?? img['url'] ?? img['image_path'] ?? '').toString();
+            if (url.startsWith('http')) return url.replaceFirst('http://', 'https://');
+            return '${ApiConfig.storageBaseUrl}/$url';
+          }).toList(),
         ),
       ),
     );

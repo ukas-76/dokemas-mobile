@@ -93,10 +93,26 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
   }
 
   List<String> get _allPhotos {
-    final list = <String>[widget.imageUrl];
+    final list = <String>[];
+
+    String sanitize(String url) {
+      if (url.isEmpty) return '';
+      var clean = url.replaceFirst('http://', 'https://');
+      if (clean.contains('/storage/') && !clean.contains('/api/storage/')) {
+        clean = clean.replaceFirst('/storage/', '/api/storage/');
+      }
+      return clean;
+    }
+
+    final mainImg = sanitize(widget.imageUrl);
+    if (mainImg.isNotEmpty) {
+      list.add(mainImg);
+    }
+
     for (final img in widget.galleryImages) {
-      if (img.isNotEmpty && !list.contains(img)) {
-        list.add(img);
+      final cleanImg = sanitize(img);
+      if (cleanImg.isNotEmpty && !list.contains(cleanImg)) {
+        list.add(cleanImg);
       }
     }
     return list;
@@ -109,7 +125,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
     });
     try {
       final apiService = ApiService();
-      final fetchedReviews = await apiService.fetchDestinationReviews(widget.destinationId);
+      final fetchedReviews = await apiService.fetchDestinationReviews(
+        widget.destinationId,
+      );
       if (!mounted) return;
       setState(() {
         _reviews = fetchedReviews;
@@ -129,7 +147,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Silahkan login terlebih dahulu untuk menyimpan ke wishlist'),
+          content: Text(
+            'Silahkan login terlebih dahulu untuk menyimpan ke wishlist',
+          ),
           backgroundColor: Colors.orange,
         ),
       );
@@ -141,7 +161,10 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
     }
 
     final wishlistProvider = context.read<WishlistProvider>();
-    bool newStatus = await wishlistProvider.toggleWishlist(token, widget.destinationId);
+    bool newStatus = await wishlistProvider.toggleWishlist(
+      token,
+      widget.destinationId,
+    );
     if (mounted) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -153,7 +176,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
           ),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: newStatus ? const Color(0xFF1E6F1D) : Colors.grey[800],
+          backgroundColor: newStatus
+              ? const Color(0xFF1E6F1D)
+              : Colors.grey[800],
         ),
       );
     }
@@ -180,7 +205,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Silahkan login terlebih dahulu untuk menambahkan itinerary'),
+            content: Text(
+              'Silahkan login terlebih dahulu untuk menambahkan itinerary',
+            ),
             backgroundColor: Colors.orange,
           ),
         );
@@ -198,7 +225,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Silahkan login terlebih dahulu untuk menghubungi mitra'),
+          content: Text(
+            'Silahkan login terlebih dahulu untuk menghubungi mitra',
+          ),
           backgroundColor: Colors.orange,
         ),
       );
@@ -217,18 +246,17 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
       ),
     );
 
-    final conv = await context
-        .read<ChatProvider>()
-        .openConversation(token, widget.destinationId);
+    final conv = await context.read<ChatProvider>().openConversation(
+      token,
+      widget.destinationId,
+    );
 
     if (mounted) {
       Navigator.pop(context);
       if (conv != null) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => ChatRoomPage(conversation: conv),
-          ),
+          MaterialPageRoute(builder: (_) => ChatRoomPage(conversation: conv)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -423,10 +451,15 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                               onTap: () async {
                                 final DateTime? picked = await showDatePicker(
                                   context: context,
-                                  initialDate: itinerary.startDate ?? DateTime.now(),
-                                  firstDate: itinerary.startDate ?? DateTime.now(),
-                                  lastDate: itinerary.endDate ??
-                                      DateTime.now().add(const Duration(days: 365)),
+                                  initialDate:
+                                      itinerary.startDate ?? DateTime.now(),
+                                  firstDate:
+                                      itinerary.startDate ?? DateTime.now(),
+                                  lastDate:
+                                      itinerary.endDate ??
+                                      DateTime.now().add(
+                                        const Duration(days: 365),
+                                      ),
                                 );
                                 if (picked != null) {
                                   setDialogState(() {
@@ -446,11 +479,15 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
                                 ),
                               ),
                             ),
@@ -494,11 +531,15 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
                                 ),
                               ),
                             ),
@@ -524,11 +565,15 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                                 contentPadding: const EdgeInsets.all(12),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
                                 ),
                               ),
                             ),
@@ -551,7 +596,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                             ? null
                             : () async {
                                 setDialogState(() => isLoading = true);
-                                final token = context.read<AuthProvider>().token;
+                                final token = context
+                                    .read<AuthProvider>()
+                                    .token;
                                 if (token == null) {
                                   setDialogState(() => isLoading = false);
                                   return;
@@ -563,7 +610,8 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                                       '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}';
                                 }
 
-                                final provider = context.read<ItineraryProvider>();
+                                final provider = context
+                                    .read<ItineraryProvider>();
                                 final error = await provider.addItem(
                                   token,
                                   itinerary.id,
@@ -580,7 +628,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Berhasil ditambahkan ke itinerary.'),
+                                      content: Text(
+                                        'Berhasil ditambahkan ke itinerary.',
+                                      ),
                                       backgroundColor: Color(0xFF1E6F1D),
                                     ),
                                   );
@@ -604,7 +654,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                 ),
                               )
                             : const Text(
@@ -667,7 +719,11 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 30,
+                          ),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
@@ -800,7 +856,8 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                         },
                         itemBuilder: (context, index) {
                           return GestureDetector(
-                            onTap: () => _showImageGalleryDialog(context, index),
+                            onTap: () =>
+                                _showImageGalleryDialog(context, index),
                             child: Image.network(
                               photos[index],
                               fit: BoxFit.cover,
@@ -857,8 +914,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                           children: [
                             Consumer<WishlistProvider>(
                               builder: (context, wishlistProvider, child) {
-                                final isFav = wishlistProvider
-                                    .isWishlisted(widget.destinationId);
+                                final isFav = wishlistProvider.isWishlisted(
+                                  widget.destinationId,
+                                );
                                 return _buildHeroCircleButton(
                                   icon: isFav
                                       ? Icons.favorite_rounded
@@ -1236,7 +1294,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border(
-            top: BorderSide(color: const Color(0xFFE2E8F0).withValues(alpha: 0.8)),
+            top: BorderSide(
+              color: const Color(0xFFE2E8F0).withValues(alpha: 0.8),
+            ),
           ),
           boxShadow: [
             BoxShadow(
@@ -1350,7 +1410,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1E6F1D),
                     elevation: 2,
-                    shadowColor: const Color(0xFF1E6F1D).withValues(alpha: 0.35),
+                    shadowColor: const Color(
+                      0xFF1E6F1D,
+                    ).withValues(alpha: 0.35),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -1492,8 +1554,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
         Text(
           widget.description,
           maxLines: _isDescriptionExpanded ? null : 3,
-          overflow:
-              _isDescriptionExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+          overflow: _isDescriptionExpanded
+              ? TextOverflow.visible
+              : TextOverflow.ellipsis,
           style: const TextStyle(
             fontSize: 13.5,
             color: Color(0xFF475569),
@@ -1576,7 +1639,10 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -1601,18 +1667,38 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
 
   Widget _buildFacilitiesSection() {
     final defaultFacilities = [
-      {'icon': Icons.local_parking_rounded, 'title': 'Parkir Luas', 'sub': 'Bus & Mobil'},
-      {'icon': Icons.mosque_rounded, 'title': 'Mushola', 'sub': 'Bersih & Nyaman'},
-      {'icon': Icons.wc_rounded, 'title': 'Toilet Bersih', 'sub': '& Gazebo Santai'},
+      {
+        'icon': Icons.local_parking_rounded,
+        'title': 'Parkir Luas',
+        'sub': 'Bus & Mobil',
+      },
+      {
+        'icon': Icons.mosque_rounded,
+        'title': 'Mushola',
+        'sub': 'Bersih & Nyaman',
+      },
+      {
+        'icon': Icons.wc_rounded,
+        'title': 'Toilet Bersih',
+        'sub': '& Gazebo Santai',
+      },
       {'icon': Icons.wifi_rounded, 'title': 'Free Wi-Fi', 'sub': 'Spot Pusat'},
-      {'icon': Icons.restaurant_rounded, 'title': 'Sentra Kuliner', 'sub': 'Mendoan Hangat'},
-      {'icon': Icons.camera_alt_outlined, 'title': 'Spot Foto', 'sub': 'Instagramable'},
+      {
+        'icon': Icons.restaurant_rounded,
+        'title': 'Sentra Kuliner',
+        'sub': 'Mendoan Hangat',
+      },
+      {
+        'icon': Icons.camera_alt_outlined,
+        'title': 'Spot Foto',
+        'sub': 'Instagramable',
+      },
     ];
 
     final items = widget.facilities.isNotEmpty
         ? widget.facilities
-            .map((f) => {'icon': f.icon, 'title': f.name, 'sub': 'Tersedia'})
-            .toList()
+              .map((f) => {'icon': f.icon, 'title': f.name, 'sub': 'Tersedia'})
+              .toList()
         : defaultFacilities;
 
     return Column(
@@ -1779,7 +1865,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
             children: [
               // Stylized Map Preview Box
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(18),
+                ),
                 child: SizedBox(
                   height: 145,
                   width: double.infinity,
@@ -1821,7 +1909,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 ConstrainedBox(
-                                  constraints: const BoxConstraints(maxWidth: 190),
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 190,
+                                  ),
                                   child: Text(
                                     widget.title,
                                     maxLines: 1,
@@ -1843,7 +1933,10 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                             decoration: BoxDecoration(
                               color: const Color(0xFF1E6F1D),
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2.5),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2.5,
+                              ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withValues(alpha: 0.25),
@@ -1933,7 +2026,10 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
   String _formatPriceCurrency(num? price) {
     if (price == null || price == 0) return 'Gratis';
     final intVal = price.toInt();
-    final formatted = intVal.toString().replaceAll(RegExp(r'\B(?=(\d{3})+(?!\d))'), '.');
+    final formatted = intVal.toString().replaceAll(
+      RegExp(r'\B(?=(\d{3})+(?!\d))'),
+      '.',
+    );
     return 'Rp $formatted';
   }
 
@@ -1954,10 +2050,16 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
             destinationId: detail!.id ?? hotelId,
             title: detail.name,
             imageUrl: detail.imageUrl,
-            rating: detail.rating > 0 ? detail.rating.toStringAsFixed(1) : '4.5',
+            rating: detail.rating > 0
+                ? detail.rating.toStringAsFixed(1)
+                : '4.5',
             reviewCount: '${detail.reviews} ulasan',
-            location: detail.area.isNotEmpty ? detail.area : (hotel['address'] ?? 'Banyumas'),
-            price: detail.price > 0 ? _formatPriceCurrency(detail.price) : 'Gratis',
+            location: detail.area.isNotEmpty
+                ? detail.area
+                : (hotel['address'] ?? 'Banyumas'),
+            price: detail.price > 0
+                ? _formatPriceCurrency(detail.price)
+                : 'Gratis',
             distance: hotel['distance_text'] ?? '-',
             openingHours: '${detail.openHour} - ${detail.closeHour}',
             description: detail.description,
@@ -1975,7 +2077,11 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
             destinationId: hotelId,
             title: hotel['name'] ?? '',
             imageUrl: hotel['thumbnail_url'] ?? '',
-            rating: (hotel['rating_avg'] != null ? (hotel['rating_avg'] as num).toDouble() : 4.5).toStringAsFixed(1),
+            rating:
+                (hotel['rating_avg'] != null
+                        ? (hotel['rating_avg'] as num).toDouble()
+                        : 4.5)
+                    .toStringAsFixed(1),
             reviewCount: '${hotel['rating_count'] ?? 0} ulasan',
             location: hotel['address'] ?? hotel['district'] ?? 'Banyumas',
             price: hotel['price'] != null && hotel['price'] > 0
@@ -2065,7 +2171,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0F766E)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF0F766E),
+                      ),
                     ),
                   ),
                   SizedBox(width: 10),
@@ -2100,7 +2208,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
     final String thumb = hotel['thumbnail_url'] ?? '';
     final String distText = hotel['distance_text'] ?? '';
     final num? price = hotel['price'];
-    final rating = hotel['rating_avg'] != null ? (hotel['rating_avg'] as num).toDouble() : 4.5;
+    final rating = hotel['rating_avg'] != null
+        ? (hotel['rating_avg'] as num).toDouble()
+        : 4.5;
     final String district = hotel['district'] ?? 'Banyumas';
 
     return InkWell(
@@ -2134,14 +2244,15 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                       ? Image.network(
                           thumb,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: const Color(0xFFF1F5F9),
-                            child: const Icon(
-                              Icons.hotel_rounded,
-                              color: Color(0xFF94A3B8),
-                              size: 32,
-                            ),
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: const Color(0xFFF1F5F9),
+                                child: const Icon(
+                                  Icons.hotel_rounded,
+                                  color: Color(0xFF94A3B8),
+                                  size: 32,
+                                ),
+                              ),
                         )
                       : Container(
                           color: const Color(0xFFF1F5F9),
@@ -2157,7 +2268,10 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                   top: 6,
                   left: 6,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF0F172A).withValues(alpha: 0.78),
                       borderRadius: BorderRadius.circular(8),
@@ -2188,7 +2302,10 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                   top: 6,
                   right: 6,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.92),
                       borderRadius: BorderRadius.circular(8),
@@ -2320,11 +2437,7 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                       color: Color(0xFF1E6F1D),
                     ),
                   ),
-                  Icon(
-                    Icons.chevron_right,
-                    size: 16,
-                    color: Color(0xFF1E6F1D),
-                  ),
+                  Icon(Icons.chevron_right, size: 16, color: Color(0xFF1E6F1D)),
                 ],
               ),
             ),
@@ -2376,10 +2489,7 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                     SizedBox(height: 2),
                     Text(
                       'Chat langsung dengan mitra resmi',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF64748B),
-                      ),
+                      style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                     ),
                   ],
                 ),
@@ -2470,7 +2580,10 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 20),
         child: Center(
-          child: Text('Gagal memuat ulasan', style: TextStyle(color: Colors.red)),
+          child: Text(
+            'Gagal memuat ulasan',
+            style: TextStyle(color: Colors.red),
+          ),
         ),
       );
     }
@@ -2505,8 +2618,8 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                 radius: 20,
                 backgroundImage:
                     review.userAvatar != null && review.userAvatar!.isNotEmpty
-                        ? NetworkImage(review.userAvatar!)
-                        : null,
+                    ? NetworkImage(review.userAvatar!)
+                    : null,
                 child: (review.userAvatar == null || review.userAvatar!.isEmpty)
                     ? Text(review.initial)
                     : null,
@@ -2536,7 +2649,9 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                   5,
                   (index) => Icon(
                     Icons.star,
-                    color: index < review.rating ? Colors.amber : Colors.grey[300],
+                    color: index < review.rating
+                        ? Colors.amber
+                        : Colors.grey[300],
                     size: 14,
                   ),
                 ),
@@ -2566,7 +2681,11 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.storefront_rounded, size: 15, color: Color(0xFF16A34A)),
+                      const Icon(
+                        Icons.storefront_rounded,
+                        size: 15,
+                        color: Color(0xFF16A34A),
+                      ),
                       const SizedBox(width: 6),
                       const Text(
                         'Respon Pengelola',
@@ -2580,7 +2699,10 @@ class _DetailDestinasiScreenState extends State<DetailDestinasiScreen> {
                         const Spacer(),
                         Text(
                           review.repliedDate!,
-                          style: const TextStyle(fontSize: 10.5, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ],
@@ -2686,7 +2808,9 @@ class _DaftarUlasanScreenState extends State<DaftarUlasanScreen> {
       _errorMessage = null;
     });
     try {
-      final reviews = await ApiService().fetchDestinationReviews(widget.destinationId);
+      final reviews = await ApiService().fetchDestinationReviews(
+        widget.destinationId,
+      );
       setState(() {
         _reviewsList = reviews;
         _isLoading = false;
@@ -2743,7 +2867,9 @@ class _DaftarUlasanScreenState extends State<DaftarUlasanScreen> {
                             });
                           },
                           child: Icon(
-                            index < selectedStars ? Icons.star : Icons.star_border,
+                            index < selectedStars
+                                ? Icons.star
+                                : Icons.star_border,
                             color: Colors.amber,
                             size: 32,
                           ),
@@ -2869,7 +2995,10 @@ class _DaftarUlasanScreenState extends State<DaftarUlasanScreen> {
         iconTheme: const IconThemeData(color: Color(0xff0d1e3d)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.rate_review_outlined, color: Color(0xFF1E6F1D)),
+            icon: const Icon(
+              Icons.rate_review_outlined,
+              color: Color(0xFF1E6F1D),
+            ),
             onPressed: () {
               final token = context.read<AuthProvider>().token;
               if (token != null) {
@@ -2877,7 +3006,9 @@ class _DaftarUlasanScreenState extends State<DaftarUlasanScreen> {
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Silahkan login terlebih dahulu untuk menulis ulasan'),
+                    content: Text(
+                      'Silahkan login terlebih dahulu untuk menulis ulasan',
+                    ),
                     backgroundColor: Colors.orange,
                   ),
                 );
@@ -2893,26 +3024,26 @@ class _DaftarUlasanScreenState extends State<DaftarUlasanScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? Center(child: Text('Error: $_errorMessage'))
-              : _reviewsList.isEmpty
-                  ? const Center(child: Text('Belum ada ulasan.'))
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(20),
-                      itemCount: _reviewsList.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final item = _reviewsList[index];
-                        return ItemReviewCard(
-                          nama: item.userName,
-                          waktu: item.date,
-                          rating: item.rating.toInt(),
-                          isi: item.comment,
-                          avatarUrl: item.userAvatar,
-                          reply: item.reply,
-                          repliedAt: item.repliedDate,
-                        );
-                      },
-                    ),
+          ? Center(child: Text('Error: $_errorMessage'))
+          : _reviewsList.isEmpty
+          ? const Center(child: Text('Belum ada ulasan.'))
+          : ListView.separated(
+              padding: const EdgeInsets.all(20),
+              itemCount: _reviewsList.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final item = _reviewsList[index];
+                return ItemReviewCard(
+                  nama: item.userName,
+                  waktu: item.date,
+                  rating: item.rating.toInt(),
+                  isi: item.comment,
+                  avatarUrl: item.userAvatar,
+                  reply: item.reply,
+                  repliedAt: item.repliedDate,
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           final token = context.read<AuthProvider>().token;
@@ -2921,7 +3052,9 @@ class _DaftarUlasanScreenState extends State<DaftarUlasanScreen> {
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Silahkan login terlebih dahulu untuk menulis ulasan'),
+                content: Text(
+                  'Silahkan login terlebih dahulu untuk menulis ulasan',
+                ),
                 backgroundColor: Colors.orange,
               ),
             );
@@ -3040,7 +3173,11 @@ class ItemReviewCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.storefront_rounded, size: 15, color: Color(0xFF16A34A)),
+                      const Icon(
+                        Icons.storefront_rounded,
+                        size: 15,
+                        color: Color(0xFF16A34A),
+                      ),
                       const SizedBox(width: 6),
                       const Text(
                         'Respon Pengelola',
@@ -3054,7 +3191,10 @@ class ItemReviewCard extends StatelessWidget {
                         const Spacer(),
                         Text(
                           repliedAt!,
-                          style: const TextStyle(fontSize: 10.5, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ],

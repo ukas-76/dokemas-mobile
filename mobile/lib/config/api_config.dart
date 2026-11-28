@@ -4,8 +4,7 @@ class ApiConfig {
   static const String baseUrl =
       'https://nomadically-premethodical-bobbye.ngrok-free.dev/api';
 
-  static String get storageBaseUrl =>
-      '${baseUrl.replaceFirst(RegExp(r'/api/?$'), '')}/storage';
+  static String get storageBaseUrl => '$baseUrl/storage';
 
   static Map<String, String> get defaultHeaders => {
         'Accept': 'application/json',

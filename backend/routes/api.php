@@ -51,6 +51,21 @@ Route::get('destinations/{destination}', [DestinationController::class, 'show'])
 Route::get('destinations/{destination}/nearby-accommodations', [DestinationController::class, 'nearbyAccommodations']);
 Route::get('destinations/{destination}/reviews', [ReviewController::class, 'index']);
 
+// Serve public storage images with full CORS support for Flutter Web
+Route::get('storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+    $mime = mime_content_type($filePath) ?: 'image/jpeg';
+    return response()->file($filePath, [
+        'Content-Type' => $mime,
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+        'Access-Control-Allow-Headers' => '*',
+    ]);
+})->where('path', '.*');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated routes (user)

@@ -15,6 +15,9 @@ class DestinationImage {
     } else {
       parsedUrl = rawThumb.replaceFirst('http://', 'https://');
     }
+    if (parsedUrl.contains('/storage/') && !parsedUrl.contains('/api/storage/')) {
+      parsedUrl = parsedUrl.replaceFirst('/storage/', '/api/storage/');
+    }
     return DestinationImage(
       id: json['id'], 
       imageUrl: parsedUrl,
@@ -148,10 +151,16 @@ class Destination {
           : null,
       thumbnailUrl: () {
         String rawThumb = (json['thumbnail_url'] ?? json['thumbnail'] ?? '').toString();
+        String url;
         if (rawThumb.isNotEmpty && !rawThumb.startsWith('http')) {
-          return '${ApiConfig.storageBaseUrl}/$rawThumb';
+          url = '${ApiConfig.storageBaseUrl}/$rawThumb';
+        } else {
+          url = rawThumb.replaceFirst('http://', 'https://');
         }
-        return rawThumb.replaceFirst('http://', 'https://');
+        if (url.contains('/storage/') && !url.contains('/api/storage/')) {
+          url = url.replaceFirst('/storage/', '/api/storage/');
+        }
+        return url;
       }(),
       facilities: json['facilities'] != null
           ? (json['facilities'] as List)
