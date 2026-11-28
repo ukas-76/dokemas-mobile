@@ -9,7 +9,7 @@ Dokumen ini berisi panduan teknis integrasi fitur rekomendasi **Penginapan & Hot
 | Parameter | Keterangan |
 | :--- | :--- |
 | **URL** | `GET /api/destinations/{id}/nearby-accommodations` |
-| **Base URL** | `https://nomadically-premethodical-bobbye.ngrok-free.dev/api` *(atau domain API backend lokal/server)* |
+| **Base URL** | `https://dokemas-mobile-production.up.railway.app/api` |
 | **Method** | `GET` |
 | **Auth** | Publik (Tidak memerlukan token login) |
 | **Headers** | `Accept: application/json`<br>`ngrok-skip-browser-warning: true` *(wajib jika lewat tunnel ngrok)* |

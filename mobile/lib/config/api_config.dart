@@ -2,7 +2,7 @@ class ApiConfig {
   // Ganti URL ini sesuai dengan URL backend yang sedang aktif
   // Pastikan diakhiri tanpa slash (/) jika endpoint sudah menggunakan /
   static const String baseUrl =
-      'https://nomadically-premethodical-bobbye.ngrok-free.dev/api';
+      'https://dokemas-mobile-production.up.railway.app/api';
 
   static String get storageBaseUrl => '$baseUrl/storage';
 
