@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 import '../../../providers/mitra_provider.dart';
+import '../../../config/api_config.dart';
 import '../../detail_destinasi_screen.dart';
 import 'mitra_edit_destinasi_page.dart';
 
